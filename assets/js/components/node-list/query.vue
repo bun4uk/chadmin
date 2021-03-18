@@ -40,7 +40,7 @@
             v-else-if="!isKilled"
             href="#"
             class="btn btn-danger"
-            data-tooltip="Вигнать розбійника"
+            data-tooltip="Kill query 🔪"
             @click="handleKillQuery(cluster, query.query_id)"
         >
           X
