@@ -33,6 +33,7 @@
     "dependencies": {
         "pretty-checkbox": "^3.0.3",
         "pretty-checkbox-vue": "^1.1.9",
+        "v-clipboard": "^2.2.3",
         "v-tooltip": "^2.0.3",
         "vue-router": "^3.4.9",
         "vuetify": "^2.3.21"

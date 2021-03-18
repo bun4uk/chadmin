@@ -28,7 +28,9 @@
         <button
             class="btn btn-sm btn-secondary"
             v-show="showCopy === true"
-            v-on:click="handleCopySQL(query.query)">copy
+            v-clipboard="query.query"
+        >
+          copy
         </button>
         {{ query.query_id }}
       </div>
@@ -82,9 +84,6 @@ export default {
     },
     toggleIsKilled() {
       this.isKilled = !this.isKilled
-    },
-    handleCopySQL(sql) {
-      window.prompt("Copy to clipboard: Ctrl+C, Enter", sql);
     }
   },
   computed: {
