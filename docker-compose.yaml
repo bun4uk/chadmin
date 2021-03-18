@@ -19,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: docker/dev/php/Dockerfile
-    image: dev/php-chadmin:7.4.13
+    image: dev/php-chadmin:8.0.3
     volumes:
       - .:/var/www/html
     env_file:
