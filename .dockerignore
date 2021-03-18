@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env.example
+.gitlab-ci*
+README.md
+docker
+docker-compose.yaml
+charts
+node_modules
+

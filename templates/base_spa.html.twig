@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Clickhouse Running Queries{% endblock %}</title>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+</head>
+<body>
+<header class="header">
+    <nav class="navbar navbar-expand-lg navbar-dark justify-content-between">
+        <a class="navbar-brand" href="/">
+            <img src="{{ asset('build/images/sandal-logo.png' ) }}"
+                 width="50"
+                 height="50"
+                 alt="MVP Office Supplies Logo"
+            >
+
+            <span class="p-3">Clickhouse Running Queries</span>
+        </a>
+    </nav>
+</header>
+<div class="wrapper">
+    {% block body %}{% endblock %}
+</div>
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+</body>
+</html>

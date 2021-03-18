@@ -1,0 +1,76 @@
+@import './components/black-component';
+@import './components/light-component';
+@import './variables/colors';
+@import '~bootstrap';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
+@import '~pretty-checkbox/src/pretty-checkbox.scss';
+
+
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    a, a:hover  {
+        color: #000;
+    }
+}
+
+.header {
+    @include black-component;
+
+    margin-bottom: 30px;
+    border-bottom: 2px solid $red-component-border;
+    padding: 0;
+
+    .logo {
+        width: 50px;
+        height: auto;
+    }
+}
+
+.footer {
+    @include black-component;
+
+    border-top: 2px solid $red-component-border;
+    color: #fff;
+    height: 90px;
+
+    span {
+        color: #ff0000;
+    }
+
+    a {
+        color: #fff;
+        text-decoration: underline;
+    }
+
+    a:hover {
+        color: #efefee;
+    }
+}
+
+.component-light {
+    @include light-component;
+    margin-top: 25px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 900px;
+}
+
+.aside-collapsed {
+    padding: 0 15px;
+}
+
+/* Анимации появления и исчезновения могут иметь */
+/* различные продолжительности и динамику.       */
+.slide-fade-enter-active {
+    transition: all .3s ease;
+}
+.slide-fade-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+    /* .slide-fade-leave-active до версии 2.1.8 */ {
+    transform: translateX(10px);
+    opacity: 0;
+}

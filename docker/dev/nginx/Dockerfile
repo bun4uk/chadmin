@@ -1,0 +1,52 @@
+FROM nginx:1.18.0-alpine AS builder
+
+ENV VTS_VERSION 0.1.18
+ENV GEOIP2_VERSION 3.3
+
+# Download sources
+RUN wget "http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" -O nginx.tar.gz && \
+    wget "https://github.com/vozlt/nginx-module-vts/archive/v${VTS_VERSION}.tar.gz" -O vts.tar.gz && \
+    wget "https://github.com/leev/ngx_http_geoip2_module/archive/${GEOIP2_VERSION}.tar.gz" -O geoip2.tar.gz
+
+# For latest build deps, see https://github.com/nginxinc/docker-nginx/blob/master/mainline/alpine/Dockerfile
+RUN apk add --no-cache --virtual .build-deps \
+  gcc \
+  libc-dev \
+  make \
+  openssl-dev \
+  pcre-dev \
+  zlib-dev \
+  linux-headers \
+  curl \
+  gnupg \
+  libxslt-dev \
+  gd-dev \
+  geoip-dev \
+  libmaxminddb-dev \
+  g++ \
+  bash
+
+# Reuse same cli arguments as the nginx:alpine image used to build
+RUN CONFARGS=$(nginx -V 2>&1 | sed -n -e 's/^.*arguments: //p') \
+  mkdir -p /usr/src && \
+  tar -zxC /usr/src -f nginx.tar.gz && \
+  tar -xzvf "vts.tar.gz" && \
+  tar -xzvf "geoip2.tar.gz" && \
+  VTSDIR="$(pwd)/nginx-module-vts-${VTS_VERSION}" && \
+  GEOIP2="$(pwd)/ngx_http_geoip2_module-${GEOIP2_VERSION}" && \
+  cd /usr/src/nginx-$NGINX_VERSION && \
+  ./configure --with-compat --with-stream $CONFARGS --add-dynamic-module=$VTSDIR --add-dynamic-module=$GEOIP2 && \
+  make modules
+
+FROM nginx:1.18.0-alpine
+
+# Copy all modules
+COPY --from=builder /usr/src/nginx-$NGINX_VERSION/objs/*.so /usr/lib/nginx/modules/
+RUN apk add --no-cache --virtual .build-deps \
+    vim \
+    libmaxminddb-dev \
+    libstdc++
+
+WORKDIR /var/www/html
+
+STOPSIGNAL SIGQUIT

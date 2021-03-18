@@ -1,0 +1,17 @@
+{% extends 'base_spa.html.twig' %}
+
+{% block body %}
+    <div id="app">
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}

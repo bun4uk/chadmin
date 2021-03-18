@@ -1,0 +1,32 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/dev/nginx/Dockerfile
+    image: dev/nginx-chadmin:1.18.0
+    volumes:
+      - ./docker/dev/nginx/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/html
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    networks:
+      - sp-net
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/dev/php/Dockerfile
+    image: dev/php-chadmin:7.4.13
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    networks:
+      - sp-net
+
+networks:
+  sp-net:
+    driver: "bridge"

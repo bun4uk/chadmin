@@ -1,0 +1,39 @@
+{
+    "browserslist": [
+        "defaults"
+    ],
+    "devDependencies": {
+        "@symfony/webpack-encore": "^0.33.0",
+        "@vue/compiler-sfc": "^3.0.2",
+        "axios": "^0.21.0",
+        "bootstrap": "beta",
+        "core-js": "^3.7.0",
+        "eslint": "^6.8.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-vue": "^6.2.2",
+        "node-sass": "^4.14.1",
+        "regenerator-runtime": "^0.13.7",
+        "sass-loader": "^9.0.3",
+        "vue": "^2.6.12",
+        "vue-loader": "15.9.5",
+        "vue-template-compiler": "^2.6.12",
+        "webpack-notifier": "^1.10.1"
+    },
+    "license": "UNLICENSED",
+    "private": true,
+    "scripts": {
+        "dev-server": "encore dev-server",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress",
+        "lint": "node_modules/.bin/eslint assets/** --ignore-pattern *.scss --ignore-pattern *.gif --ignore-pattern *.png"
+    },
+    "dependencies": {
+        "pretty-checkbox": "^3.0.3",
+        "pretty-checkbox-vue": "^1.1.9",
+        "v-tooltip": "^2.0.3",
+        "vue-router": "^3.4.9",
+        "vuetify": "^2.3.21"
+    }
+}

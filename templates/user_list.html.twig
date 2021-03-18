@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Users
+{% endblock %}
+{% block body %}
+    <h1>User List</h1>
+{#    {{ dump() }}#}
+    <div class="container-fluid query_list">
+        <div class="row">
+            <div class="col-4">
+                <div class="row">
+                    <div class="col">
+                        <div class="row bg-secondary text-light">
+                            <div class="col-1"></div>
+                            <div class="col-1">
+                                ID
+                            </div>
+                            <div class="col-5">
+                                Name
+                            </div>
+                            <div class="col-5">
+                                Role
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        {% for key,user in users %}
+                            <div class="row">
+                                <div class="col-1"></div>
+                                <div class="col-1">
+                                    {{ key+1 }}
+                                </div>
+                                <div class="col-5">
+                                    <a href="/user/{{ user.name }}">{{ user.name }}</a>
+                                </div>
+                                <div class="col-5">
+                                    {% for role in user.roles %}
+                                        {{ role }}<br>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col-1"></div>
+                    <div class="colf">
+                        {% if user is not null %}
+                            <h3>{{ user.name }}'s grants:</h3>
+                            <ul>
+                                {% for grant in user.grants %}
+                                    {% for rule in grant %}
+                                        <li>{{ rule }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+{% endblock %}
