@@ -44,7 +44,7 @@
       </div>
       <div class="col-2 text-left">
       <span v-if="query.is_cancelled">
-          Розбійник виходить
+          Killing...
         </span>
         <span
             v-else-if="!isKilled"
@@ -56,7 +56,7 @@
           X
         </span>
         <span v-else>
-          Розбійник виходить
+          Killing...
         </span>
       </div>
     </div>
