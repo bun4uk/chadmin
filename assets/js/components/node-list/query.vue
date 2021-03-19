@@ -26,11 +26,19 @@
            @mouseleave="showCopy = false"
       >
         <button
-            class="btn btn-sm btn-secondary"
+            :class="['btn','btn-sm', 'btn-secondary', this.$style['btn-copy']]"
             v-show="showCopy === true"
             v-clipboard="query.query"
         >
-          copy
+          copy query
+        </button>
+        <button
+            :class="['btn','btn-sm', 'btn-secondary', this.$style['btn-copy']]"
+            v-show="showCopy === true"
+            v-clipboard="query.query_id"
+            style="left: 110px"
+        >
+          copy id
         </button>
         {{ query.query_id }}
       </div>
@@ -38,15 +46,15 @@
       <span v-if="query.is_cancelled">
           Розбійник виходить
         </span>
-        <a
+        <span
             v-else-if="!isKilled"
             href="#"
-            class="btn btn-danger"
+            class="btn-sm btn-danger"
             data-tooltip="Kill query 🔪"
             @click="handleKillQuery(cluster, query.query_id)"
         >
           X
-        </a>
+        </span>
         <span v-else>
           Розбійник виходить
         </span>
@@ -160,5 +168,9 @@ export default {
   top: 3vw;
   width: auto;
   line-height: 1.5;
+}
+
+.btn-copy {
+  position: absolute;
 }
 </style>
