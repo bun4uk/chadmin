@@ -88,7 +88,6 @@ export default {
     async handleKillQuery(cluster, queryId) {
       this.toggleIsKilled();
       const response = await axios.get('/api/kill-query/' + queryId);
-      console.log(response);
     },
     toggleIsKilled() {
       this.isKilled = !this.isKilled
@@ -164,10 +163,13 @@ export default {
 }
 
 .sql_query[data-tooltip]::after {
-  left: -45vw;
+  left: calc(-100%);
   top: 3vw;
-  width: auto;
+  width: 200%;
   line-height: 1.5;
+  overflow: auto;
+  overflow-wrap: break-word;
+  height: auto;
 }
 
 .btn-copy {
