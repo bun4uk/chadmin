@@ -6,7 +6,7 @@
         "@symfony/webpack-encore": "^1.1.2",
         "@vue/compiler-sfc": "^3.0.7",
         "axios": "^0.21.1",
-        "bootstrap": "beta",
+        "bootstrap": "latest",
         "core-js": "^3.9.1",
         "eslint": "^7.22.0",
         "eslint-config-airbnb-base": "^14.2.1",
@@ -18,7 +18,7 @@
         "sass-loader": "^11.0.1",
         "vue": "^2.6.12",
         "vue-loader": "15.9.5",
-        "vue-template-compiler": "^2.6.12",
+        "vue-template-compiler": "^2.6.12",пше
         "webpack-notifier": "^1.13.0"
     },
     "license": "UNLICENSED",
