@@ -6,7 +6,9 @@
 @import '~pretty-checkbox/src/pretty-checkbox.scss';
 
 
-
+html {
+    min-height: 100%;
+}
 body {
     font-family: 'Montserrat', sans-serif;
     a, a:hover  {

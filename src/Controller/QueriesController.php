@@ -28,7 +28,7 @@ class QueriesController extends AbstractController
 
         $processes = [];
         $processesQueries = [];
-//dd($nodes);
+
         for ($i = 0, $count = count($nodes); $i < $count; $i++) {
             $processesQueries[$i] = $client->client->selectAsync(
                 <<<SQL

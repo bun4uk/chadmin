@@ -8,7 +8,7 @@
         {{ query.user }}
       </div>
       <div class="col-2">
-        {{ query.elapsed.toFixed(2) }} sec.
+        {{ query.elapsed.toFixed(2) | formattedTime }}
       </div>
 
 
@@ -23,22 +23,24 @@
       <div :class="[this.$style['sql_query'] , 'col-4']" tabindex="0"
            :data-tooltip="query.query"
            @mouseover="showCopy = true"
-           @mouseleave="showCopy = false"
+           @mouseleave="showCopyMouseLeave"
       >
         <button
             :class="['btn','btn-sm', 'btn-secondary', this.$style['btn-copy']]"
             v-show="showCopy === true"
             v-clipboard="query.query"
+            v-on:click="showCopiedForQuery"
         >
-          copy query
+          {{ copy_query_sql_text }}
         </button>
         <button
             :class="['btn','btn-sm', 'btn-secondary', this.$style['btn-copy']]"
             v-show="showCopy === true"
             v-clipboard="query.query_id"
+            v-on:click="showCopiedForId"
             style="left: 110px"
         >
-          copy id
+          {{ copy_query_id_text }}
         </button>
         {{ query.query_id }}
       </div>
@@ -71,7 +73,9 @@ export default {
   name: 'Query',
   data: () => ({
     isKilled: false,
-    showCopy: false
+    showCopy: false,
+    copy_query_id_text: 'copy id',
+    copy_query_sql_text: 'copy query'
   })
   ,
   props: {
@@ -91,6 +95,21 @@ export default {
     },
     toggleIsKilled() {
       this.isKilled = !this.isKilled
+    },
+    updateDiffs() {
+      this.query.elapsed += 1;
+    },
+    showCopiedForQuery() {
+      this.copy_query_sql_text = 'copied!';
+    },
+    showCopiedForId() {
+      this.copy_query_id_text = 'copied!';
+    },
+    showCopyMouseLeave(){
+      this.showCopy = false
+      this.copy_query_id_text = 'copy id';
+      this.copy_query_sql_text = 'copy query';
+
     }
   },
   computed: {
@@ -101,6 +120,23 @@ export default {
     price() {
       return (this.product.price / 100).toLocaleString('en-US', {minimumFractionDigits: 2});
     },
+  },
+  filters: {
+    formattedTime: function (value) {
+      var sec_num = parseInt(value, 10);
+      var hours = Math.floor(sec_num / 3600);
+      var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+      var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+      //if (hours   < 10) {hours   = "0"+hours;}
+      if (minutes < 10) {
+        minutes = "0" + minutes;
+      }
+      if (seconds < 10) {
+        seconds = "0" + seconds;
+      }
+      return +minutes + ':' + seconds;
+    }
   },
 };
 </script>
