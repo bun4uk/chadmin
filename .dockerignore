@@ -1,10 +1,36 @@
 .git
 .gitignore
-.env.example
-.gitlab-ci*
-README.md
-docker
-docker-compose.yaml
-charts
-node_modules
+.gitattributes
+.github
+.dockerignore
+.idea
+.vscode
+.phpactor.json
+.DS_Store
 
+# Local env — must be supplied at runtime via -e or --env-file
+.env
+.env.local
+.env.*.local
+
+# Build artefacts (generated inside the image)
+node_modules
+public/build
+public/bundles
+vendor
+var
+
+# Dev-only docker tooling (we ship a single prod image at the repo root)
+docker-compose.yaml
+docker-compose.yml
+docker/dev
+
+# Docs / repo metadata
+LICENSE
+*.md
+
+# Logs and tmp
+*.log
+npm-debug.log
+yarn-error.log
+clickhouse-api-key-*.txt

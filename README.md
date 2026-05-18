@@ -6,11 +6,43 @@ Chadmin is an administration panel for ClickHouse — a real-time dashboard for 
 
 ## Installation and Setup
 
-### Requirements
+### Run via Docker Hub (fastest)
+
+The published image at [`bun4uk/chadmin`](https://hub.docker.com/r/bun4uk/chadmin) bundles nginx + php-fpm + the built frontend in a single container. No clone, no build:
+
+```bash
+docker run -d \
+  --name chadmin \
+  -p 8080:80 \
+  -e CLICKHOUSE_HOST=clickhouse.example.com \
+  -e CLICKHOUSE_PORT=8123 \
+  -e CLICKHOUSE_USERNAME=default \
+  -e CLICKHOUSE_PASSWORD=secret \
+  bun4uk/chadmin:latest
+```
+
+Then open http://localhost:8080.
+
+For ClickHouse Cloud, pass the API credentials instead — Cloud mode turns on automatically:
+
+```bash
+docker run -d \
+  --name chadmin \
+  -p 8080:80 \
+  -e CLICKHOUSE_CLOUD_KEY_ID=xxxxxxxx \
+  -e CLICKHOUSE_CLOUD_KEY_SECRET=yyyyyyyy \
+  bun4uk/chadmin:latest
+```
+
+See `.env.example` for the full list of supported environment variables. Available tags: `latest`, `M.m.p` (semver), `M.m`, `M`. Multi-arch images are published for `linux/amd64` and `linux/arm64`.
+
+### Run via Docker Compose (development)
+
+#### Requirements
 - Docker and Docker Compose
 - Git
 
-### Quick Start
+#### Quick Start
 
 1. Clone the repository:
    ```bash
