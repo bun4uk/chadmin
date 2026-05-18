@@ -4,58 +4,40 @@ declare(strict_types=1);
 
 namespace App\Resolver;
 
-use App\Service\ClickHouseClient;
-use ClickHouseDB\Client;
-use Generator;
+use App\Topology\TopologyMode;
+use App\Topology\TopologyProvider;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
- * Class ClusterNameResolver
- * @package App\Resolver
+ * Backward-compat resolver for legacy controller argument `?string $cluster = null`.
+ *
+ * Driven by {@see TopologyProvider} instead of raw SQL (which previously was non-deterministic
+ * on ClickHouse Cloud — `SELECT cluster FROM system.clusters LIMIT 1` could return either
+ * `default` or `all_groups.default`).
+ *
+ *  - Cloud: cluster name of the primary target (usually 'default').
+ *  - Cluster: the real cluster name.
+ *  - Single: null (legacy controllers branch on null = single-node mode).
  */
-class ClusterNameResolver implements ArgumentValueResolverInterface
+final class ClusterNameResolver implements ValueResolverInterface
 {
-    /**
-     * @var Client
-     */
-    private Client $clickHouseClient;
+    public function __construct(private readonly TopologyProvider $topologyProvider) {}
 
-    /**
-     * ClusterNameResolver constructor.
-     * @param ClickHouseClient $clickHouseClient
-     */
-    public function __construct(ClickHouseClient $clickHouseClient)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $this->clickHouseClient = $clickHouseClient->client;
-    }
+        if ($argument->getType() !== 'string' || $argument->getName() !== 'cluster') {
+            return [];
+        }
 
-    /**
-     * Whether this resolver can resolve the value for the given ArgumentMetadata.
-     *
-     * @param Request $request
-     * @param ArgumentMetadata $argument
-     *
-     * @return bool
-     */
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
+        $topology = $this->topologyProvider->getTopology();
+        if ($topology->mode === TopologyMode::Single) {
+            yield null;
+            return;
+        }
 
-        return $argument->getType() === 'string' && $argument->getName() === 'cluster';
-    }
-
-    /**
-     * @param Request $request
-     * @param ArgumentMetadata $argument
-     *
-     * @return Generator
-     */
-    public function resolve(
-        Request $request,
-        ArgumentMetadata $argument
-    ): Generator
-    {
-        yield $this->clickHouseClient->select('select cluster from system.clusters limit 1')->fetchRow('cluster');
+        $primary = $topology->primaryTarget();
+        yield $primary?->cluster ?: null;
     }
 }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Chadmin - Query Monitoring{% endblock %}</title>
+    <!-- Favicon links тимчасово вимкнені -->
+    <link rel="icon" type="image/x-icon" href="/build/images/favicon/favicon.ico">
+    {# <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('build/images/favicon/favicon-32x32.png') }}"> #}
+    {# <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('build/images/favicon/favicon-16x16.png') }}"> #}
+    {% block stylesheets %}
+        {# default empty; pages можуть перевизначити #}
+    {% endblock %}
+
+    {% block javascripts %}
+        {# default empty; pages можуть перевизначити #}
+    {% endblock %}
+</head>
+<body class="bg-bgdark text-white">
+    <div id="react-root" class="app-container">
+
+        <main class="app-content">
+            {% block body %}{% endblock %}
+        </main>
+
+        <footer class="app-footer text-center">
+            <p>Chadmin &copy; {{ "now"|date("Y") }}</p>
+        </footer>
+    </div>
+</body>
+</html> 

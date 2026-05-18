@@ -1,0 +1,430 @@
+/* ============================================================
+ * Chadmin — global styles, design tokens, component primitives.
+ * @import must come before @import "tailwindcss" per Tailwind 4 order rules.
+ * ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@import "tailwindcss";
+
+/* Tailwind 4 CSS-first theme config.
+   Keep the token names that existing components already use (`bg-bgdark`,
+   `text-accent`, `border-accent`) but route them through the theme-aware
+   CSS variables below so switching the `.light` class flips them at runtime. */
+@theme {
+  --color-bgdark: var(--bg-0);
+  --color-accent: var(--accent-on-surface);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+/* ============================================================
+ * Design tokens — dark (default) + light (.light on <html>)
+ * ============================================================ */
+:root {
+  /* Brand */
+  --ch-yellow: #faff69;
+  --ch-yellow-soft: #faff69cc;
+  --ch-yellow-40: #faff6966;
+  --ch-yellow-20: #faff6933;
+
+  /* Dark theme (default) */
+  --bg-0: #1f1f1c;
+  --bg-1: #262622;
+  --bg-2: #2d2d2a;
+  --bg-hover: #32322e;
+
+  --fg-1: #ffffff;
+  --fg-2: #d4d4cf;
+  --fg-3: #9ca3af;
+  --fg-4: #6b7280;
+
+  --accent: var(--ch-yellow);
+  --accent-fg: #1f1f1c;
+  --accent-border: var(--ch-yellow);
+  --accent-on-surface: var(--ch-yellow);
+
+  --border-1: var(--ch-yellow);
+  --border-2: var(--ch-yellow-40);
+  --border-3: #3a3a36;
+
+  /* State badges */
+  --state-running-bg:  #1e4d2b;  --state-running-fg:  #a6f2b7;
+  --state-partial-bg:  #4d3a1e;  --state-partial-fg:  #ffd591;
+  --state-degraded-bg: #5c1e1e;  --state-degraded-fg: #ff9494;
+  --state-idle-bg:     #2d2d2d;  --state-idle-fg:     #bfbfbf;
+  --state-stopped-bg:  #2d2d2d;  --state-stopped-fg:  #a0a0a0;
+  --state-awaking-bg:  #1e3a4d;  --state-awaking-fg:  #9ecbff;
+  --state-failed-bg:   #5c1e1e;  --state-failed-fg:   #ff6666;
+
+  --danger: #ff6b6b;
+  --danger-soft: #f87171;
+  --warning: #ffd591;
+  --success: #a6f2b7;
+  --info:    #9ecbff;
+
+  /* RAM heat gradient */
+  --ram-cool: #9ca3af;
+  --ram-warn: #ffd591;
+  --ram-hot:  #ff6b6b;
+
+  /* Type */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-body: 14px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 32px;
+
+  --lh-tight: 1.15;
+  --lh-normal: 1.4;
+  --lh-loose: 1.6;
+
+  /* Spacing (4px grid) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* Radii */
+  --r-sm: 3px;
+  --r-md: 4px;
+  --r-lg: 6px;
+  --r-pill: 999px;
+
+  /* Borders & shadows */
+  --bw-1: 1px;
+  --bw-2: 2px;
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-2: 0 4px 12px rgba(0,0,0,0.45);
+  --shadow-3: 0 8px 24px rgba(0,0,0,0.55);
+
+  /* Motion */
+  --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-1: 150ms;
+  --dur-2: 300ms;
+
+  /* Legacy aliases so existing rules keep working */
+  --bg-dark: var(--bg-0);
+  --text: var(--fg-1);
+}
+
+/* Light theme — yellow flips to near-black for text/borders; kept only as a brand fill. */
+.light {
+  --bg-0: #ffffff;
+  --bg-1: #fafaf7;
+  --bg-2: #f0f0ec;
+  --bg-hover: #ebebe5;
+
+  --fg-1: #000000;
+  --fg-2: #2a2a27;
+  --fg-3: #5a5a55;
+  --fg-4: #8a8a85;
+
+  --accent: #1f1f1c;
+  --accent-fg: #ffffff;
+  --accent-on-surface: #1f1f1c;
+
+  --border-1: #1f1f1c;
+  --border-2: #1f1f1c33;
+  --border-3: #0000001a;
+
+  --state-running-bg:  #dcf5e2;  --state-running-fg:  #1d6b2f;
+  --state-partial-bg:  #fff1d6;  --state-partial-fg:  #8a5a00;
+  --state-degraded-bg: #ffe0e0;  --state-degraded-fg: #a10000;
+  --state-idle-bg:     #e8e8e3;  --state-idle-fg:     #555555;
+  --state-stopped-bg:  #e8e8e3;  --state-stopped-fg:  #666666;
+  --state-awaking-bg:  #dbecff;  --state-awaking-fg:  #1e4d86;
+  --state-failed-bg:   #ffe0e0;  --state-failed-fg:   #a10000;
+
+  --danger: #c43232;
+  --danger-soft: #b12a2a;
+
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-2: 0 4px 12px rgba(0,0,0,0.12);
+  --shadow-3: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+/* ============================================================
+ * Semantic type utilities
+ * ============================================================ */
+.h1 { font: 600 var(--fs-3xl)/var(--lh-tight) var(--font-sans); letter-spacing: -0.01em; }
+.h2 { font: 600 var(--fs-2xl)/var(--lh-tight) var(--font-sans); letter-spacing: -0.01em; }
+.h3 { font: 600 var(--fs-xl)/var(--lh-tight) var(--font-sans); }
+.h4 { font: 600 var(--fs-lg)/var(--lh-tight) var(--font-sans); }
+.h5 { font: 600 var(--fs-md)/var(--lh-tight) var(--font-sans); }
+.p  { font: 400 var(--fs-body)/var(--lh-normal) var(--font-sans); }
+.small { font: 400 var(--fs-sm)/var(--lh-normal) var(--font-sans); color: var(--fg-3); }
+.meta  { font: 400 var(--fs-xs)/var(--lh-normal) var(--font-sans); color: var(--fg-3); }
+.label-caps { font: 600 var(--fs-xs)/1 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; }
+.code, code, pre { font-family: var(--font-mono); font-size: 13px; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-0);
+  color: var(--fg-1);
+  margin: 0;
+}
+
+/* ============================================================
+ * App shell — footer pinned to the bottom of the viewport without
+ * creating extra scroll when the content is short. When content is
+ * tall, the footer flows naturally after it and scrolls with the page.
+ * dvh tracks the dynamic viewport so mobile address-bar show/hide
+ * doesn't create a gap; vh is the fallback for older browsers.
+ * ============================================================ */
+.app-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.app-container > .app-content { flex: 1 0 auto; }
+.app-container > .app-footer {
+  flex: 0 0 auto;
+  padding: 12px 16px;
+  text-align: center;
+  color: var(--fg-3);
+  font-size: var(--fs-xs);
+  border-top: 1px solid var(--border-3);
+}
+
+/* ============================================================
+ * Cursor — every interactive element uses the pointer cursor.
+ * Native <button> / <input type=checkbox> / <label> default to the
+ * text/arrow cursor in most browsers; this normalises them.
+ * ============================================================ */
+button:not(:disabled),
+a,
+select,
+summary,
+label,
+input[type="checkbox"],
+input[type="radio"] { cursor: pointer; }
+
+button:disabled { cursor: not-allowed; }
+
+/* ============================================================
+ * Mobile overflow guards.
+ * Grid/flex children default to `min-width: auto`, which lets a long
+ * table or <pre> force the parent wider than its grid cell and create
+ * a horizontal page scroll. Popovers are rendered as fixed overlays at
+ * the document root, so `overflow: hidden` on the tile doesn't clip them.
+ * ============================================================ */
+main, main *, section, section * { min-width: 0; }
+.overflow-x-auto,
+.overflow-auto { max-width: 100%; }
+main > section { overflow: hidden; }
+
+/* ============================================================
+ * Accent button (Refresh, Users, Copy ID, Copy SQL, Format SQL, nav links)
+ * ============================================================ */
+.btn-accent {
+  padding: 2px 8px;
+  border-radius: var(--r-md);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: var(--accent-on-surface);
+  border: 1px solid var(--accent-on-surface);
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--dur-1), color var(--dur-1);
+  font-family: var(--font-sans);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-on-surface);
+  color: var(--bg-0);
+}
+.btn-accent:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-accent-sm {
+  font-size: var(--fs-sm);
+}
+
+/* ============================================================
+ * Danger button (Kill query, Delete)
+ * ============================================================ */
+.btn-danger {
+  padding: 2px 8px;
+  border-radius: var(--r-md);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--dur-1), color var(--dur-1);
+  font-family: var(--font-sans);
+}
+.btn-danger:hover:not(:disabled) {
+  background: #ff6b6b;
+  color: #ffffff;
+}
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-danger-sm {
+  font-size: var(--fs-sm);
+}
+
+/* ============================================================
+ * Native <select> — force appearance:none so our border renders.
+ * Used for the interval picker in the shell bar.
+ * ============================================================ */
+select.ch-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 4px 28px 4px 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--accent-on-surface);
+  background-color: transparent;
+  color: var(--fg-1);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px;
+}
+select.ch-select option {
+  color: #1f1f1c;
+  background: #ffffff;
+}
+
+/* Brand-fill select (warehouse / service pickers) — yellow fill in dark,
+   white fill in light; always black text/border. */
+select.ch-select-brand {
+  background-color: var(--ch-yellow);
+  color: #1f1f1c;
+  border-color: #1f1f1c;
+}
+html.light select.ch-select-brand {
+  background-color: #ffffff;
+  color: #1f1f1c;
+  border-color: #1f1f1c;
+}
+
+/* ============================================================
+ * SQL code block — dark in dark theme, light-on-light in light theme.
+ * Highlight.js atom-one-dark stylesheet is imported by QueryModal; the
+ * light-theme overrides below restore readable token colors on white.
+ * ============================================================ */
+pre.sql-pre {
+  background: #1f1f1c !important;
+  border: 1px solid #3a3a36;
+  color: #e8e8e3;
+  padding: 12px;
+  border-radius: var(--r-md);
+  overflow: auto;
+  margin: 0;
+}
+pre.sql-pre code,
+pre.sql-pre code.hljs {
+  background: transparent !important;
+  color: inherit;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: var(--lh-loose);
+}
+
+html.light pre.sql-pre {
+  background: #fafaf7 !important;
+  border-color: #d0d0c8;
+  color: #1f1f1c;
+}
+html.light pre.sql-pre .hljs-keyword,
+html.light pre.sql-pre .hljs-selector-tag,
+html.light pre.sql-pre .hljs-meta-keyword,
+html.light pre.sql-pre .hljs-doctag,
+html.light pre.sql-pre .hljs-section { color: #8a2be2; font-weight: 600; }
+html.light pre.sql-pre .hljs-built_in,
+html.light pre.sql-pre .hljs-type,
+html.light pre.sql-pre .hljs-title,
+html.light pre.sql-pre .hljs-title.function_,
+html.light pre.sql-pre .hljs-title.class_,
+html.light pre.sql-pre .hljs-attr { color: #004d99; }
+html.light pre.sql-pre .hljs-string,
+html.light pre.sql-pre .hljs-regexp,
+html.light pre.sql-pre .hljs-addition { color: #1d6b2f; }
+html.light pre.sql-pre .hljs-number,
+html.light pre.sql-pre .hljs-literal { color: #a05a00; }
+html.light pre.sql-pre .hljs-comment,
+html.light pre.sql-pre .hljs-quote { color: #6b6b66; font-style: italic; }
+html.light pre.sql-pre .hljs-variable,
+html.light pre.sql-pre .hljs-template-variable,
+html.light pre.sql-pre .hljs-attribute { color: #a10000; }
+html.light pre.sql-pre .hljs-operator,
+html.light pre.sql-pre .hljs-punctuation { color: #1f1f1c; }
+
+/* ============================================================
+ * Toast stack — bottom-left, 4s auto-dismiss, colored left border per variant.
+ * ============================================================ */
+.toast-container {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+}
+.toast {
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-3);
+  border-left-width: 3px;
+  background: var(--bg-1);
+  color: var(--fg-1);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  box-shadow: var(--shadow-2);
+  animation: toast-in var(--dur-2) var(--ease-std);
+  min-width: 220px;
+}
+.toast.success { border-left-color: var(--success); }
+.toast.error   { border-left-color: var(--danger); }
+.toast.info    { border-left-color: var(--info); }
+.toast.warning { border-left-color: var(--warning); }
+@keyframes toast-in {
+  from { transform: translateX(-16px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+/* ============================================================
+ * Row fade transitions used by TargetTile's process table.
+ * ============================================================ */
+.fade-enter        { opacity: 0; }
+.fade-enter-active { opacity: 1; transition: opacity var(--dur-2) ease-in; }
+.fade-exit         { opacity: 1; }
+.fade-exit-active  { opacity: 0; transition: opacity var(--dur-2) ease-in; }
+
+/* ============================================================
+ * Theme-aware overrides for the Tailwind utilities existing code relies on.
+ * The @theme block above already wires `bg-bgdark`, `text-accent`, `border-accent`
+ * through the CSS variables, but Tailwind's generated opacity modifiers
+ * (`bg-bgdark/60`, etc.) bake the value at parse time, so explicit fallbacks
+ * are still necessary for those.
+ * ============================================================ */
+.light .bg-bgdark\/60 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}

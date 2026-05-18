@@ -1,21 +1,25 @@
-FROM php:8.0.3-fpm-alpine
+FROM php:8.5.5-fpm-alpine3.22
 
 RUN apk add --no-cache \
-    \
     libzip-dev \
-    \
     icu-dev \
     libxml2-dev \
-    \
-    mysql-client \
     tzdata \
-    git \
-    bash
+    linux-headers
 
-RUN docker-php-ext-install sockets intl bcmath zip pcntl pdo_mysql mysqli soap \
-  && docker-php-ext-enable opcache
+RUN docker-php-ext-install intl \
+ && docker-php-ext-install bcmath \
+ && docker-php-ext-install zip \
+ && docker-php-ext-install pcntl \
+ && docker-php-ext-install pdo_mysql \
+ && docker-php-ext-install mysqli \
+ && docker-php-ext-install soap
 
-RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --version=2.0.8 --filename=composer
+# Opcache: in PHP 8.5 the extension may ship compiled-in or as shared — try to enable,
+# ignore failure (some base images don't expose a separate opcache.so).
+RUN docker-php-ext-enable opcache || true
+
+RUN php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer --version=2.9.7
 
 WORKDIR /var/www/html
 

@@ -1,41 +1,45 @@
 {
-    "browserslist": [
-        "defaults"
-    ],
-    "devDependencies": {
-        "@symfony/webpack-encore": "^1.1.2",
-        "@vue/compiler-sfc": "^3.0.7",
-        "axios": "^0.21.1",
-        "bootstrap": "latest",
-        "core-js": "^3.9.1",
-        "eslint": "^7.22.0",
-        "eslint-config-airbnb-base": "^14.2.1",
-        "eslint-plugin-import": "^2.22.1",
-        "eslint-plugin-vue": "^7.7.0",
-        "file-loader": "^6.0.0",
-        "node-sass": "^5.0.0",
-        "regenerator-runtime": "^0.13.7",
-        "sass-loader": "^11.0.1",
-        "vue": "^2.6.12",
-        "vue-loader": "15.9.5",
-        "vue-template-compiler": "^2.6.12",
-        "webpack-notifier": "^1.13.0"
-    },
-    "license": "UNLICENSED",
-    "private": true,
-    "scripts": {
-        "dev-server": "encore dev-server",
-        "dev": "encore dev",
-        "watch": "encore dev --watch",
-        "build": "encore production --progress",
-        "lint": "node_modules/.bin/eslint assets/** --ignore-pattern *.scss --ignore-pattern *.gif --ignore-pattern *.png"
-    },
-    "dependencies": {
-        "pretty-checkbox": "^3.0.3",
-        "pretty-checkbox-vue": "^1.1.9",
-        "v-clipboard": "^2.2.3",
-        "v-tooltip": "^2.0.3",
-        "vue-router": "^3.4.9",
-        "vuetify": "^2.3.21"
-    }
+  "name": "chadmin",
+  "version": "2.0.0",
+  "description": "ClickHouse admin panel — query monitor and access management for single nodes, self-hosted clusters, and ClickHouse Cloud.",
+  "main": "index.js",
+  "scripts": {
+    "dev-server": "vite --config frontend/vite.config.ts",
+    "dev": "vite --config frontend/vite.config.ts",
+    "watch": "CHOKIDAR_USEPOLLING=true vite build --watch --config frontend/vite.config.ts",
+    "build": "vite build --config frontend/vite.config.ts"
+  },
+  "keywords": [
+    "clickhouse",
+    "admin",
+    "dashboard",
+    "symfony"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@clickhouse/click-ui": "0.1.0",
+    "clipboard-polyfill": "4.1.1",
+    "date-fns": "4.1.0",
+    "dayjs": "1.11.20",
+    "highlight.js": "11.11.1",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "react-transition-group": "4.4.5",
+    "sql-formatter": "15.7.3",
+    "styled-components": "6.4.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.4",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@types/react-transition-group": "4.4.12",
+    "@vitejs/plugin-react": "6.0.1",
+    "autoprefixer": "10.5.0",
+    "postcss": "8.5.10",
+    "tailwindcss": "4.2.4",
+    "typescript": "6.0.3",
+    "vite": "8.0.9",
+    "vite-plugin-static-copy": "4.1.0"
+  }
 }

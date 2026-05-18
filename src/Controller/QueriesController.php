@@ -1,103 +1,124 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
-use App\Service\ClickHouseClient;
-use ClickHouseDB\Exception\QueryException;
-use Exception;
+use App\ClickHouse\ConnectionManager;
+use App\ClickHouse\QueryBuilder;
+use App\ClickHouse\TargetNotQueryableException;
+use App\Topology\Target;
+use App\Topology\TopologyProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * Class QueriesController
- * @package App\Controller
- */
-class QueriesController extends AbstractController
+final class QueriesController extends AbstractController
 {
-    /**
-     * @param string $cluster
-     * @param ClickHouseClient $client
-     * @return Response
-     * @Route("/api/cluster-processes", name="api_cluster_processes")
-     */
-    public function apiQueries(string $cluster, ClickHouseClient $client): Response
+    public function __construct(
+        private readonly TopologyProvider $topologyProvider,
+        private readonly ConnectionManager $connectionManager,
+        private readonly QueryBuilder $queryBuilder,
+    ) {}
+
+    #[Route('/api/cluster-processes', name: 'api_cluster_processes', methods: ['GET'])]
+    public function apiQueries(Target $target): Response
     {
-        $nodes = $client->client->select('select * from system.clusters')->rows();
+        if (!$target->isQueryable()) {
+            return $this->json([
+                'cluster' => $target->cluster !== '' ? $target->cluster : null,
+                'target' => $target->toJson(),
+                'sleeping' => true,
+                'processes' => (object) [],
+                'memory_metrics' => (object) [],
+            ]);
+        }
+
+        try {
+            $client = $this->connectionManager->clientFor($target);
+        } catch (TargetNotQueryableException) {
+            return $this->json([
+                'cluster' => $target->cluster !== '' ? $target->cluster : null,
+                'target' => $target->toJson(),
+                'sleeping' => true,
+                'processes' => (object) [],
+                'memory_metrics' => (object) [],
+            ]);
+        }
+
+        $processesRows = $client->select($this->queryBuilder->processesSql($target))->rows();
+        $memoryRows = $client->select($this->queryBuilder->memoryMetricsSql($target))->rows();
 
         $processes = [];
-        $processesQueries = [];
-
-        for ($i = 0, $count = count($nodes); $i < $count; $i++) {
-            $processesQueries[$i] = $client->client->selectAsync(
-                <<<SQL
-select *, 
-       formatReadableSize(memory_usage) as formatted_memory_usage, 
-       formatReadableSize(read_bytes) as formatted_read_bytes,  
-       formatReadableSize(written_bytes) as formatted_written_bytes
-from remote('{$nodes[$i]['host_name']}', 'system', 'processes', '{$client->client->getConnectUsername()}', '{$client->client->getConnectPassword()}')
-where elapsed >1
-SQL
-            );
-        }
-        $client->client->executeAsync();
-        for ($i = 0, $count = count($nodes); $i < $count; $i++) {
-            try {
-                $processes[$nodes[$i]['host_name']] = $processesQueries[$i]->rows();
-            } catch (QueryException $exception) {
-            }
+        foreach ($processesRows as $row) {
+            $fqdn = (string) ($row['fqdn'] ?? '');
+            $processes[$fqdn][] = $row;
         }
 
-        return $this->json(['cluster' => $cluster, 'processes' => $processes]);
+        $memoryData = [];
+        foreach ($memoryRows as $row) {
+            $fqdn = (string) ($row['fqdn'] ?? '');
+            $metric = (string) ($row['metric'] ?? '');
+            $memoryData[$fqdn][$metric] = $row;
+        }
+
+        return $this->json([
+            'cluster' => $target->cluster !== '' ? $target->cluster : null,
+            'target' => $target->toJson(),
+            'processes' => $processes !== [] ? $processes : (object) [],
+            'memory_metrics' => $memoryData !== [] ? $memoryData : (object) [],
+        ]);
     }
 
-    /**
-     * @param string $cluster
-     * @param string $queryId
-     * @param ClickHouseClient $client
-     * @return Response
-     * @Route("/api/kill-query/{queryId}", name="api_kill_query")
-     */
-    public function apiKillQuery(string $cluster, string $queryId, ClickHouseClient $client): Response
+    #[Route('/api/kill-query/{queryId}', name: 'api_kill_query', methods: ['GET', 'POST', 'DELETE'])]
+    public function apiKillQuery(Target $target, string $queryId): Response
     {
         try {
-            $client->client->write("KILL QUERY ON CLUSTER {$cluster} WHERE query_id='{$queryId}'");
-
-        } catch (Exception $exception) {
-            return $this->json(['status' => false, 'query_id' => $queryId]);
+            $client = $this->connectionManager->clientFor($target);
+            $client->write($this->queryBuilder->killQuerySql($target, $queryId));
+        } catch (TargetNotQueryableException $e) {
+            return $this->json([
+                'status' => false,
+                'query_id' => $queryId,
+                'exception' => $e->getMessage(),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->json([
+                'status' => false,
+                'query_id' => $queryId,
+                'exception' => $e->getMessage(),
+            ]);
         }
 
         return $this->json(['status' => 'ok', 'query_id' => $queryId]);
     }
 
     /**
-     * @param string $cluster
-     * @return JsonResponse
-     * @Route("/api/get-cluster-name", name="api_get_cluster_name")
+     * Legacy endpoint — kept for frontend back-compat. Returns the primary target's cluster name
+     * (or null in single mode).
      */
-    public function getCluster(string $cluster): JsonResponse
+    #[Route('/api/get-cluster-name', name: 'api_get_cluster_name', methods: ['GET'])]
+    public function getCluster(?string $cluster = null): JsonResponse
     {
         return $this->json(['cluster' => $cluster]);
     }
 
     /**
-     * @param ClickHouseClient $client
-     * @return JsonResponse
-     * @Route("/api/get-cluster-list", name="api_get_cluster_list")
+     * Legacy endpoint — frontend uses this to populate its cluster dropdown.
+     * Now derived from Topology targets.
      */
-    public function getClusterList(ClickHouseClient $client): JsonResponse
+    #[Route('/api/get-cluster-list', name: 'api_get_cluster_list', methods: ['GET'])]
+    public function getClusterList(): JsonResponse
     {
-        $nodes = $client->client->select('SELECT DISTINCT cluster FROM system.clusters WHERE is_local = 1');
-        $clusterList = [];
-        while (true) {
-            $res = $nodes->fetchRow('cluster');
-            if ($res === null) {
-                break;
+        $topology = $this->topologyProvider->getTopology();
+        $names = [];
+        foreach ($topology->targets as $target) {
+            if ($target->cluster !== '' && !in_array($target->cluster, $names, true)) {
+                $names[] = $target->cluster;
             }
-            $clusterList[] = $res;
         }
 
-        return $this->json($clusterList);
+        return $this->json($names);
     }
 }

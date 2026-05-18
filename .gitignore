@@ -6,15 +6,20 @@
 /.env.*.local
 /.env
 /config/secrets/prod/prod.decrypt.private.php
+/config/reference.php
 /public/bundles/
 /src/.preload.php
 /var/
 /vendor/
+/design_handoff_chadmin
 ###< symfony/framework-bundle ###
 
-###> symfony/webpack-encore-bundle ###
+# Node / Vite
 /node_modules/
 /public/build/
 npm-debug.log
 yarn-error.log
-###< symfony/webpack-encore-bundle ###
+
+.mcp.json
+clickhouse-api-key-*.txt
+.phpactor.json
