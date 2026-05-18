@@ -2,7 +2,8 @@
 
 Chadmin is an administration panel for ClickHouse — a real-time dashboard for monitoring running queries, managing users and access, and operating ClickHouse Cloud services. It auto-detects whether you're running a **single node**, a **self-hosted cluster**, or **ClickHouse Cloud**, and adapts the UI and SQL accordingly.
 
-![Chadmin Dashboard](https://user-images.githubusercontent.com/14631690/111626669-f6f6b500-87f6-11eb-95e5-f52df087c1dd.png)
+
+![Chadmin Dashboard](https://github.com/user-attachments/assets/a2541685-0b4b-433f-8cb0-3f72d6c7204f)
 
 ## Installation and Setup
 
