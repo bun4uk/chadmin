@@ -1,0 +1,155 @@
+/* ============================================================
+ * Chadmin Design System — colors_and_type.css
+ * Dark-first dashboard for ClickHouse admin. "ClickHouse yellow" accent.
+ * ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* -------- Brand -------- */
+  --ch-yellow: #faff69;       /* ClickHouse yellow — primary accent */
+  --ch-yellow-soft: #faff69cc;
+  --ch-yellow-40: #faff6966;  /* borders, dividers */
+  --ch-yellow-20: #faff6933;  /* faint separators */
+
+  /* -------- Dark theme (default) -------- */
+  --bg-0: #1f1f1c;   /* page background — true brand dark */
+  --bg-1: #262622;   /* elevated surface (tiles, modals) */
+  --bg-2: #2d2d2a;   /* sunken panel / nested block */
+  --bg-hover: #32322e;
+
+  --fg-1: #ffffff;   /* primary text */
+  --fg-2: #d4d4cf;   /* secondary text */
+  --fg-3: #9ca3af;   /* muted / meta (gray-400) */
+  --fg-4: #6b7280;   /* disabled / placeholder */
+
+  --accent: var(--ch-yellow);
+  --accent-fg: #1f1f1c;      /* text on accent fill */
+  --accent-border: var(--ch-yellow);
+  --accent-on-surface: var(--ch-yellow); /* readable accent for text on bg-0 */
+
+  --border-1: var(--ch-yellow);      /* primary border — always yellow in dark */
+  --border-2: var(--ch-yellow-40);   /* secondary / nested */
+  --border-3: #3a3a36;               /* neutral divider */
+
+  /* -------- Semantic (status badges / alerts) -------- */
+  --state-running-bg:  #1e4d2b;  --state-running-fg:  #a6f2b7;
+  --state-partial-bg:  #4d3a1e;  --state-partial-fg:  #ffd591;
+  --state-degraded-bg: #5c1e1e;  --state-degraded-fg: #ff9494;
+  --state-idle-bg:     #2d2d2d;  --state-idle-fg:     #bfbfbf;
+  --state-stopped-bg:  #2d2d2d;  --state-stopped-fg:  #a0a0a0;
+  --state-awaking-bg:  #1e3a4d;  --state-awaking-fg:  #9ecbff;
+  --state-failed-bg:   #5c1e1e;  --state-failed-fg:   #ff6666;
+
+  --danger: #ff6b6b;       /* destructive text / borders */
+  --danger-soft: #f87171;  /* buttons, delete */
+  --warning: #ffd591;
+  --success: #a6f2b7;
+  --info:    #9ecbff;
+
+  /* -------- RAM heat gradient stops (used in code) -------- */
+  --ram-cool: #9ca3af;
+  --ram-warn: #ffd591;
+  --ram-hot:  #ff6b6b;
+
+  /* -------- Type -------- */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-body: 14px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 32px;
+
+  --lh-tight: 1.15;
+  --lh-normal: 1.4;
+  --lh-loose: 1.6;
+
+  /* -------- Spacing (4px grid) -------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* -------- Radii (subtle — admin panel, not consumer app) -------- */
+  --r-sm: 3px;
+  --r-md: 4px;    /* default Tailwind `rounded` */
+  --r-lg: 6px;
+  --r-pill: 999px;
+
+  /* -------- Borders & shadows -------- */
+  --bw-1: 1px;
+  --bw-2: 2px;        /* tile outer border */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-2: 0 4px 12px rgba(0,0,0,0.45);   /* modals */
+  --shadow-3: 0 8px 24px rgba(0,0,0,0.55);   /* overlays */
+
+  /* -------- Motion -------- */
+  --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-1: 150ms;
+  --dur-2: 300ms;
+}
+
+/* -------- Light theme (activated by .light on <html>) -------- */
+.light {
+  --bg-0: #ffffff;
+  --bg-1: #fafaf7;
+  --bg-2: #f0f0ec;
+  --bg-hover: #ebebe5;
+
+  --fg-1: #000000;
+  --fg-2: #2a2a27;
+  --fg-3: #5a5a55;
+  --fg-4: #8a8a85;
+
+  /* In light mode, yellow-on-white is unreadable. Keep yellow as brand
+     FILL (buttons / selected states) but use near-black as the ACCENT used
+     for text, borders and underlines. */
+  --accent: #1f1f1c;
+  --accent-fg: #ffffff;
+  --accent-on-surface: #1f1f1c;
+
+  --border-1: #1f1f1c;
+  --border-2: #1f1f1c33;
+  --border-3: #0000001a;
+
+  --state-running-bg:  #dcf5e2;  --state-running-fg:  #1d6b2f;
+  --state-partial-bg:  #fff1d6;  --state-partial-fg:  #8a5a00;
+  --state-degraded-bg: #ffe0e0;  --state-degraded-fg: #a10000;
+  --state-idle-bg:     #e8e8e3;  --state-idle-fg:     #555;
+  --state-stopped-bg:  #e8e8e3;  --state-stopped-fg:  #666;
+  --state-awaking-bg:  #dbecff;  --state-awaking-fg:  #1e4d86;
+  --state-failed-bg:   #ffe0e0;  --state-failed-fg:   #a10000;
+
+  --danger: #c43232;
+  --danger-soft: #b12a2a;
+}
+
+/* ============================================================
+ * Semantic type utilities (use alongside CSS vars in prototypes)
+ * ============================================================ */
+.h1 { font: 600 var(--fs-3xl)/var(--lh-tight) var(--font-sans); letter-spacing: -0.01em; }
+.h2 { font: 600 var(--fs-2xl)/var(--lh-tight) var(--font-sans); letter-spacing: -0.01em; }
+.h3 { font: 600 var(--fs-xl)/var(--lh-tight) var(--font-sans); }
+.h4 { font: 600 var(--fs-lg)/var(--lh-tight) var(--font-sans); }
+.h5 { font: 600 var(--fs-md)/var(--lh-tight) var(--font-sans); }
+.p  { font: 400 var(--fs-body)/var(--lh-normal) var(--font-sans); }
+.small { font: 400 var(--fs-sm)/var(--lh-normal) var(--font-sans); color: var(--fg-3); }
+.meta  { font: 400 var(--fs-xs)/var(--lh-normal) var(--font-sans); color: var(--fg-3); text-transform: none; }
+.label-caps { font: 600 var(--fs-xs)/1 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; }
+.code, code, pre { font-family: var(--font-mono); font-size: 13px; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+body {
+  background: var(--bg-0);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+}

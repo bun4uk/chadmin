@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chadmin — real-time admin panel for ClickHouse</title>
+  <meta name="description" content="Open-source admin panel for ClickHouse. Auto-detects single node, self-hosted cluster, or ClickHouse Cloud. Monitor queries, kill runaway loads, manage access, wake idle services." />
+
+  <meta property="og:title" content="Chadmin — real-time admin panel for ClickHouse" />
+  <meta property="og:description" content="Monitor queries, kill runaway loads, manage access, wake idle Cloud services. One Docker image. Auto-detects topology." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bun4uk.github.io/chadmin/" />
+  <meta property="og:image" content="https://github.com/user-attachments/assets/a2541685-0b4b-433f-8cb0-3f72d6c7204f" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ch-yellow: #faff69;
+      --ch-yellow-soft: #faff69cc;
+      --ch-yellow-40: #faff6966;
+      --ch-yellow-20: #faff6933;
+      --ch-yellow-10: #faff691a;
+
+      --bg-0: #1f1f1c;
+      --bg-1: #26261f;
+      --bg-2: #2d2d2a;
+      --bg-3: #161614;
+
+      --fg-1: #ffffff;
+      --fg-2: #d4d4cf;
+      --fg-3: #9ca3af;
+      --fg-4: #6b7280;
+
+      --border-1: #faff69;
+      --border-2: #faff6966;
+      --border-3: #3a3a36;
+
+      --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+      --container: 1180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg-0);
+      color: var(--fg-1);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible { outline: 2px solid var(--ch-yellow); outline-offset: 3px; border-radius: 2px; }
+
+    button { font-family: inherit; cursor: pointer; }
+
+    code, pre { font-family: var(--font-mono); }
+
+    ::selection { background: var(--ch-yellow); color: var(--bg-0); }
+
+    /* ---------- Layout ---------- */
+    .container {
+      width: 100%;
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 96px 0; position: relative; }
+    section + section { border-top: 1px solid var(--border-3); }
+
+    @media (max-width: 720px) {
+      section { padding: 64px 0; }
+    }
+
+    /* ---------- Nav ---------- */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(31, 31, 28, 0.85);
+      backdrop-filter: saturate(140%) blur(10px);
+      -webkit-backdrop-filter: saturate(140%) blur(10px);
+      border-bottom: 1px solid var(--border-3);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      max-width: var(--container);
+      margin: 0 auto;
+      gap: 24px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .brand img { width: 28px; height: 22px; object-fit: contain; }
+    .nav-links { display: flex; align-items: center; gap: 22px; }
+    .nav-links a {
+      color: var(--fg-2);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color .15s ease;
+    }
+    .nav-links a:hover { color: var(--ch-yellow); }
+    .nav-links .gh-star {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--border-3);
+      border-radius: 6px;
+      transition: border-color .15s ease, color .15s ease;
+    }
+    .nav-links .gh-star:hover { border-color: var(--ch-yellow); color: var(--ch-yellow); }
+    @media (max-width: 640px) {
+      .nav-links a:not(.gh-star) { display: none; }
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 100px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(800px 380px at 50% 0%, rgba(250, 255, 105, 0.13), transparent 70%),
+        radial-gradient(600px 300px at 80% 30%, rgba(250, 255, 105, 0.05), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at center, rgba(250, 255, 105, 0.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(ellipse 700px 400px at 50% 30%, black, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 700px 400px at 50% 30%, black, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero .container { position: relative; z-index: 1; text-align: center; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid var(--border-2);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ch-yellow);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--ch-yellow-10);
+    }
+    .eyebrow .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--ch-yellow); box-shadow: 0 0 8px var(--ch-yellow); }
+
+    h1.hero-title {
+      margin: 28px 0 20px;
+      font-size: clamp(40px, 7vw, 84px);
+      line-height: 1.02;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      color: var(--fg-1);
+    }
+    h1.hero-title .accent {
+      color: var(--ch-yellow);
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .hero-sub {
+      max-width: 680px;
+      margin: 0 auto 36px;
+      font-size: clamp(16px, 1.6vw, 19px);
+      color: var(--fg-2);
+      line-height: 1.55;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: transform .12s ease, background .15s ease, border-color .15s ease, color .15s ease;
+      border: 1px solid transparent;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--ch-yellow);
+      color: var(--bg-0);
+      border-color: var(--ch-yellow);
+    }
+    .btn-primary:hover { background: #fff; border-color: #fff; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--fg-1);
+      border-color: var(--border-3);
+    }
+    .btn-secondary:hover { border-color: var(--ch-yellow); color: var(--ch-yellow); }
+
+    .arrow { transition: transform .15s ease; }
+    .btn:hover .arrow { transform: translateX(2px); }
+
+    /* ---------- Code chip ---------- */
+    .code-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px 12px 18px;
+      background: var(--bg-3);
+      border: 1px solid var(--border-3);
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: var(--fg-2);
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .code-chip .prompt { color: var(--ch-yellow); user-select: none; }
+    .code-chip .cmd { color: var(--fg-1); }
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 6px 10px;
+      background: transparent;
+      border: 1px solid var(--border-3);
+      border-radius: 6px;
+      color: var(--fg-3);
+      font-size: 12px;
+      font-weight: 500;
+      transition: color .15s ease, border-color .15s ease, background .15s ease;
+      font-family: var(--font-sans);
+    }
+    .copy-btn:hover { color: var(--ch-yellow); border-color: var(--ch-yellow); }
+    .copy-btn.copied { color: var(--bg-0); background: var(--ch-yellow); border-color: var(--ch-yellow); }
+
+    /* ---------- Demo section ---------- */
+    .section-head {
+      max-width: 720px;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+    .section-head .label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ch-yellow);
+      margin-bottom: 14px;
+    }
+    h2 {
+      margin: 0 0 16px;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+    }
+    .section-head p {
+      margin: 0;
+      color: var(--fg-2);
+      font-size: clamp(15px, 1.4vw, 17px);
+    }
+
+    .demo-frame {
+      position: relative;
+      border: 1px solid var(--border-2);
+      border-radius: 14px;
+      background: var(--bg-1);
+      overflow: hidden;
+      box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(250, 255, 105, 0.08);
+    }
+    .demo-chrome {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border-3);
+    }
+    .demo-dots { display: flex; gap: 6px; }
+    .demo-dots span {
+      width: 11px; height: 11px; border-radius: 999px;
+      background: var(--border-3);
+    }
+    .demo-dots span:nth-child(1) { background: #ff5f57; }
+    .demo-dots span:nth-child(2) { background: #febc2e; }
+    .demo-dots span:nth-child(3) { background: #28c840; }
+    .demo-url {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg-3);
+      padding: 4px 12px;
+      background: var(--bg-0);
+      border-radius: 6px;
+      border: 1px solid var(--border-3);
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .demo-url .lock { color: var(--ch-yellow); margin-right: 6px; }
+    .demo-iframe {
+      width: 100%;
+      height: 720px;
+      border: 0;
+      display: block;
+      background: var(--bg-0);
+    }
+    @media (max-width: 900px) {
+      .demo-iframe { height: 560px; }
+    }
+    .demo-foot {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 14px;
+      color: var(--fg-3);
+    }
+    .demo-foot a {
+      color: var(--ch-yellow);
+      font-weight: 500;
+    }
+    .demo-foot a:hover { text-decoration: underline; }
+
+    /* ---------- Topologies ---------- */
+    .topologies { background: var(--bg-1); }
+    .topo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 880px) { .topo-grid { grid-template-columns: 1fr; } }
+
+    .topo-card {
+      background: var(--bg-0);
+      border: 1px solid var(--border-3);
+      border-radius: 14px;
+      padding: 28px 26px;
+      transition: border-color .2s ease, transform .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .topo-card:hover {
+      border-color: var(--ch-yellow);
+      transform: translateY(-2px);
+    }
+    .topo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--ch-yellow-10);
+      border: 1px solid var(--border-2);
+      margin-bottom: 18px;
+      color: var(--ch-yellow);
+    }
+    .topo-card h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .topo-card .tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-3);
+      margin-bottom: 12px;
+    }
+    .topo-card p {
+      margin: 0 0 14px;
+      color: var(--fg-2);
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+    .topo-card ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .topo-card li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 13.5px;
+      color: var(--fg-3);
+      line-height: 1.7;
+    }
+    .topo-card li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 9px;
+      width: 8px; height: 1px;
+      background: var(--ch-yellow);
+    }
+
+    /* ---------- Features ---------- */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 880px) { .feat-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) { .feat-grid { grid-template-columns: 1fr; } }
+
+    .feat-card {
+      padding: 24px 22px;
+      background: var(--bg-1);
+      border: 1px solid var(--border-3);
+      border-radius: 12px;
+      transition: border-color .2s ease;
+    }
+    .feat-card:hover { border-color: var(--border-2); }
+    .feat-icon {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      background: var(--ch-yellow-10);
+      color: var(--ch-yellow);
+      margin-bottom: 14px;
+    }
+    .feat-card h4 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+    }
+    .feat-card p {
+      margin: 0;
+      color: var(--fg-3);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    /* ---------- Quick start ---------- */
+    .install { background: var(--bg-1); }
+    .install-wrap {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+    .tabs {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      background: var(--bg-0);
+      border: 1px solid var(--border-3);
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+    .tab {
+      padding: 8px 16px;
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+      color: var(--fg-3);
+      font-size: 13px;
+      font-weight: 500;
+      transition: background .15s ease, color .15s ease;
+    }
+    .tab.active {
+      background: var(--ch-yellow);
+      color: var(--bg-0);
+      font-weight: 600;
+    }
+    .tab:not(.active):hover { color: var(--fg-1); }
+
+    .code-block {
+      position: relative;
+      background: var(--bg-3);
+      border: 1px solid var(--border-3);
+      border-left: 2px solid var(--ch-yellow);
+      border-radius: 10px;
+      padding: 20px 56px 20px 20px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--fg-2);
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+    .code-block .copy-btn-abs {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+    .code-block .k { color: var(--ch-yellow); }
+    .code-block .v { color: #e5d6a6; }
+    .code-block .c { color: var(--fg-4); }
+    .code-block .o { color: var(--fg-3); }
+
+    .install-note {
+      color: var(--fg-3);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .install-note a { color: var(--ch-yellow); font-weight: 500; }
+    .install-note a:hover { text-decoration: underline; }
+    .install-note code {
+      background: var(--bg-0);
+      border: 1px solid var(--border-3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: var(--ch-yellow);
+    }
+
+    /* ---------- Footer ---------- */
+    footer {
+      padding: 48px 0 64px;
+      border-top: 1px solid var(--border-3);
+      color: var(--fg-3);
+      font-size: 13.5px;
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .footer-brand {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--fg-2);
+      font-weight: 600;
+    }
+    .footer-brand img { width: 24px; height: 19px; object-fit: contain; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 22px; }
+    .footer-links a { color: var(--fg-3); transition: color .15s ease; }
+    .footer-links a:hover { color: var(--ch-yellow); }
+
+    /* ---------- Tiny utilities ---------- */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="/" class="brand">
+        <img src="assets/chadmin-logo.png" alt="" />
+        <span>Chadmin</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#demo">Demo</a>
+        <a href="#topologies">Topologies</a>
+        <a href="#install">Install</a>
+        <a href="https://hub.docker.com/r/bun4uk/chadmin" target="_blank" rel="noopener">Docker Hub</a>
+        <a href="https://github.com/bun4uk/chadmin" target="_blank" rel="noopener" class="gh-star">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow"><span class="dot"></span>Open source · MIT</span>
+      <h1 class="hero-title">A real-time admin panel for <span class="accent">ClickHouse</span></h1>
+      <p class="hero-sub">
+        Auto-detects topology — <strong>single node</strong>, <strong>self-hosted cluster</strong>, or <strong>ClickHouse Cloud</strong>.
+        Monitor queries, kill runaway loads, manage access, and wake idle services.
+      </p>
+      <div class="cta-row">
+        <a href="#demo" class="btn btn-primary">
+          Try the live demo
+          <span class="arrow">→</span>
+        </a>
+        <a href="https://github.com/bun4uk/chadmin" class="btn btn-secondary" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="code-chip">
+        <span class="prompt">$</span>
+        <span class="cmd" id="hero-cmd">docker run -d -p 8080:80 -e CLICKHOUSE_HOST=your-host bun4uk/chadmin:latest</span>
+        <button class="copy-btn" data-copy="#hero-cmd">Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo" id="demo">
+    <div class="container">
+      <div class="section-head">
+        <span class="label">Live preview</span>
+        <h2>Click around, no install needed</h2>
+        <p>Embedded UI kit with mock data across all three topology modes. Kill a query, drop a user, switch warehouses, toggle the theme.</p>
+      </div>
+      <div class="demo-frame">
+        <div class="demo-chrome">
+          <div class="demo-dots"><span></span><span></span><span></span></div>
+          <div class="demo-url"><span class="lock">⬢</span>chadmin.local</div>
+          <div style="width: 60px;"></div>
+        </div>
+        <iframe class="demo-iframe" src="demo/" title="Chadmin live demo" loading="lazy"></iframe>
+      </div>
+      <p class="demo-foot">
+        <a href="demo/" target="_blank" rel="noopener">Open the demo in a new tab ↗</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="topologies" id="topologies">
+    <div class="container">
+      <div class="section-head">
+        <span class="label">One UI, three modes</span>
+        <h2>Auto-detects your ClickHouse</h2>
+        <p>Set the env vars and Chadmin figures out the rest. Same dashboard, mode-aware SQL underneath.</p>
+      </div>
+      <div class="topo-grid">
+
+        <article class="topo-card">
+          <div class="topo-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="6" y="4" width="12" height="16" rx="2"/>
+              <line x1="9" y1="8" x2="15" y2="8"/>
+              <line x1="9" y1="12" x2="15" y2="12"/>
+              <line x1="9" y1="16" x2="13" y2="16"/>
+            </svg>
+          </div>
+          <span class="tag">CLICKHOUSE_MODE=single</span>
+          <h3>Single node</h3>
+          <p>One host, one connection. Lightweight, zero topology probing.</p>
+          <ul>
+            <li>Direct queries against <code>system.*</code></li>
+            <li>No cluster overhead</li>
+            <li>HTTP or HTTPS</li>
+          </ul>
+        </article>
+
+        <article class="topo-card">
+          <div class="topo-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="6" height="7" rx="1"/>
+              <rect x="15" y="4" width="6" height="7" rx="1"/>
+              <rect x="3" y="14" width="6" height="7" rx="1"/>
+              <rect x="15" y="14" width="6" height="7" rx="1"/>
+              <line x1="9" y1="7" x2="15" y2="7"/>
+              <line x1="9" y1="17" x2="15" y2="17"/>
+              <line x1="6" y1="11" x2="6" y2="14"/>
+              <line x1="18" y1="11" x2="18" y2="14"/>
+            </svg>
+          </div>
+          <span class="tag">CLICKHOUSE_MODE=cluster</span>
+          <h3>Self-hosted cluster</h3>
+          <p>Failover across hosts; per-replica memory and state in one view.</p>
+          <ul>
+            <li><code>clusterAllReplicas()</code> queries</li>
+            <li>Comma-separated host failover</li>
+            <li>Skips unavailable shards</li>
+          </ul>
+        </article>
+
+        <article class="topo-card">
+          <div class="topo-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 18a4 4 0 010-8 5 5 0 019.6-1.5A4.5 4.5 0 0117 18H7z"/>
+            </svg>
+          </div>
+          <span class="tag">CLICKHOUSE_MODE=cloud</span>
+          <h3>ClickHouse Cloud</h3>
+          <p>API-driven service discovery. Wake idle services on demand without polling them awake.</p>
+          <ul>
+            <li>Control-plane state, not data-plane probes</li>
+            <li>Warehouse-aware grouping</li>
+            <li>One-click wake for idle/stopped</li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <div class="section-head">
+        <span class="label">What you get</span>
+        <h2>Operator-grade ClickHouse tooling</h2>
+        <p>Built for the things you actually do at 3am when a query is eating the cluster.</p>
+      </div>
+      <div class="feat-grid">
+
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h4>Live query monitor</h4>
+          <p>30-second polling with pause-on-hidden — your idle Cloud services stay idle.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+            </svg>
+          </div>
+          <h4>One-click kill</h4>
+          <p>Per-replica <code>KILL QUERY</code> with confirmation. No SQL editor needed.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 00-3-3.87"/>
+              <path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
+          <h4>Users & access</h4>
+          <p>Browse <code>system.users</code> / <code>grants</code> / <code>role_grants</code>; drop accounts in a click.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </div>
+          <h4>Wake idle services</h4>
+          <p>Cloud-aware: control plane for state, data-plane ping only when you ask.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <h4>Single Docker image</h4>
+          <p>nginx + php-fpm + React, baked. Multi-arch: <code>linux/amd64</code> and <code>linux/arm64</code>.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+            </svg>
+          </div>
+          <h4>Dark & light themes</h4>
+          <p>That ClickHouse-yellow accent, in both moods. Persists across reloads.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="install" id="install">
+    <div class="container">
+      <div class="section-head">
+        <span class="label">Quick start</span>
+        <h2>Up in 30 seconds</h2>
+        <p>Pick a registry, paste the run command, open <code>http://localhost:8080</code>.</p>
+      </div>
+      <div class="install-wrap">
+        <div class="tabs" role="tablist">
+          <button class="tab active" role="tab" aria-selected="true" data-tab="dh">Docker Hub</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="ghcr">GHCR</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="cloud">ClickHouse Cloud</button>
+        </div>
+
+        <div class="code-block" id="tab-dh">
+<pre style="margin:0"><span class="c"># Self-hosted ClickHouse — single host or cluster</span>
+<span class="k">docker run</span> <span class="o">-d</span> <span class="o">--name</span> chadmin <span class="o">-p</span> <span class="v">8080:80</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_HOST</span>=<span class="v">clickhouse.example.com</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_PORT</span>=<span class="v">8123</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_USERNAME</span>=<span class="v">default</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_PASSWORD</span>=<span class="v">secret</span> \
+  <span class="v">bun4uk/chadmin:latest</span></pre>
+          <button class="copy-btn copy-btn-abs" data-copy="#tab-dh pre">Copy</button>
+        </div>
+
+        <div class="code-block hidden" id="tab-ghcr">
+<pre style="margin:0"><span class="c"># Same image, GitHub Container Registry</span>
+<span class="k">docker run</span> <span class="o">-d</span> <span class="o">--name</span> chadmin <span class="o">-p</span> <span class="v">8080:80</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_HOST</span>=<span class="v">clickhouse.example.com</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_PORT</span>=<span class="v">8123</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_USERNAME</span>=<span class="v">default</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_PASSWORD</span>=<span class="v">secret</span> \
+  <span class="v">ghcr.io/bun4uk/chadmin:latest</span></pre>
+          <button class="copy-btn copy-btn-abs" data-copy="#tab-ghcr pre">Copy</button>
+        </div>
+
+        <div class="code-block hidden" id="tab-cloud">
+<pre style="margin:0"><span class="c"># Cloud mode auto-activates when API credentials are present</span>
+<span class="k">docker run</span> <span class="o">-d</span> <span class="o">--name</span> chadmin <span class="o">-p</span> <span class="v">8080:80</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_CLOUD_KEY_ID</span>=<span class="v">xxxxxxxx</span> \
+  <span class="o">-e</span> <span class="k">CLICKHOUSE_CLOUD_KEY_SECRET</span>=<span class="v">yyyyyyyy</span> \
+  <span class="v">bun4uk/chadmin:latest</span></pre>
+          <button class="copy-btn copy-btn-abs" data-copy="#tab-cloud pre">Copy</button>
+        </div>
+
+        <p class="install-note">
+          Full env-var reference is in <a href="https://github.com/bun4uk/chadmin/blob/main/.env.example" target="_blank" rel="noopener"><code>.env.example</code></a>.
+          Available tags: <code>latest</code>, semver (<code>M.m.p</code>), <code>M.m</code>, <code>M</code>.
+          Need help? Open an <a href="https://github.com/bun4uk/chadmin/issues" target="_blank" rel="noopener">issue</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="assets/chadmin-logo.png" alt="" />
+        <span>Chadmin · MIT licensed</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/bun4uk/chadmin" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://hub.docker.com/r/bun4uk/chadmin" target="_blank" rel="noopener">Docker Hub</a>
+        <a href="https://github.com/bun4uk/chadmin/pkgs/container/chadmin" target="_blank" rel="noopener">GHCR</a>
+        <a href="https://github.com/bun4uk/chadmin/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="demo/" target="_blank" rel="noopener">Live demo</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Copy buttons
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const sel = btn.getAttribute('data-copy');
+        const node = document.querySelector(sel);
+        if (!node) return;
+        const text = node.innerText.trim();
+        try {
+          await navigator.clipboard.writeText(text);
+          const original = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.classList.remove('copied');
+          }, 1400);
+        } catch (e) {
+          // Fallback: select text
+          const range = document.createRange();
+          range.selectNode(node);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        }
+      });
+    });
+
+    // Install tabs
+    const tabs = document.querySelectorAll('.tab');
+    const panels = {
+      dh: document.getElementById('tab-dh'),
+      ghcr: document.getElementById('tab-ghcr'),
+      cloud: document.getElementById('tab-cloud'),
+    };
+    tabs.forEach(t => {
+      t.addEventListener('click', () => {
+        const id = t.getAttribute('data-tab');
+        tabs.forEach(x => {
+          x.classList.toggle('active', x === t);
+          x.setAttribute('aria-selected', x === t ? 'true' : 'false');
+        });
+        Object.entries(panels).forEach(([k, el]) => {
+          el.classList.toggle('hidden', k !== id);
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
