@@ -13,10 +13,11 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build-and-push:
-    name: Build and push to Docker Hub
+    name: Build and push to Docker Hub & GHCR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,11 +35,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: bun4uk/chadmin
+          images: |
+            bun4uk/chadmin
+            ghcr.io/${{ github.repository }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
