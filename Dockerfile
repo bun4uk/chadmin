@@ -81,8 +81,8 @@ COPY docker/entrypoint.sh         /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh \
  && mkdir -p /var/www/html/var /run/nginx \
  && chown -R www-data:www-data /var/www/html/var /var/www/html/public \
- # Symfony Dotenv::bootEnv() вимагає реальний .env; справжні значення приходять через
- # `docker run -e ...` і мають пріоритет над файлом, тому .env.example тут — лише плейсхолдер.
+ # Symfony Dotenv::bootEnv() requires a real .env; actual values come from
+ # `docker run -e ...` and have higher priority than the file, so .env.example is just a placeholder.
  && cp /var/www/html/.env.example /var/www/html/.env
 
 EXPOSE 80
