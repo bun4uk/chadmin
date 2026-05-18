@@ -37,6 +37,20 @@ docker run -d \
 
 See `.env.example` for the full list of supported environment variables. Available tags: `latest`, `M.m.p` (semver), `M.m`, `M`. Multi-arch images are published for `linux/amd64` and `linux/arm64`.
 
+If you prefer keeping the configuration in a file, mount an env file instead of passing individual `-e` flags:
+
+```bash
+docker run -d --name chadmin -p 8080:80 --env-file .env bun4uk/chadmin:latest
+```
+
+To upgrade to a newer version, pull the new tag and recreate the container:
+
+```bash
+docker pull bun4uk/chadmin:latest
+docker rm -f chadmin
+docker run -d --name chadmin -p 8080:80 --env-file .env bun4uk/chadmin:latest
+```
+
 ### Run via Docker Compose (development)
 
 #### Requirements
@@ -127,11 +141,4 @@ docker-compose exec app bin/console cache:clear
 - Cloud-only: wake idle/stopped services from the UI; deep-link to a specific warehouse/service via URL params (`?warehouse=…&service=…`)
 - Light/dark theme toggle, persisted per browser
 - Polling pauses when the tab is hidden, so idle Cloud services aren't kept warm by a background tab
-
-## Project Optimizations
-
-### Docker Configuration
-
-- **Container Memory**: Frontend container memory limit set to 8GB in `docker-compose.yml`
-- **Automatic Build**: Frontend container runs Vite in watch mode automatically
 
