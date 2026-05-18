@@ -60,6 +60,8 @@ RUN apk add --no-cache \
         mysqli \
         soap \
  && (docker-php-ext-enable opcache || true) \
+ # CVE-2026-24049 — vendored wheel .dist-info is dead metadata (see vex/chadmin.openvex.json).
+ && rm -rf /usr/lib/python*/site-packages/setuptools/_vendor/wheel-*.dist-info \
  && rm -rf /var/cache/apk/* /tmp/*
 
 WORKDIR /var/www/html
