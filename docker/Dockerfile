@@ -32,6 +32,7 @@ COPY public/   ./public/
 
 RUN npm run build
 
+# Target for base php-fpm mode
 FROM php:8.5.5-fpm-alpine3.23 AS base
 
 RUN (docker-php-ext-enable opcache || true)
@@ -43,16 +44,20 @@ RUN addgroup -S chadmin && adduser --uid 1984 -S chadmin -G chadmin && \
 
 # Application source + built artifacts
 COPY --chown=chadmin:chadmin . /var/www/html 
-COPY --from=vendor   --chown=chadmin:chadmin /app/vendor/      /var/www/html/vendor/
 COPY --from=frontend --chown=chadmin:chadmin /app/public/build /var/www/html/public/build
+COPY --from=vendor   --chown=chadmin:chadmin /app/vendor/      /var/www/html/vendor/
 
 COPY docker/configs/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+
 USER chadmin
+
 CMD ["php-fpm", "-F"]
 
 
 # Target for all in one image mode
 FROM base AS aio
+
+USER root
 
 RUN apk add --no-cache \
        nginx \
@@ -73,5 +78,6 @@ USER chadmin
 
 EXPOSE 80
 
+# Let's have some fun
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]
