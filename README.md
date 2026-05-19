@@ -2,7 +2,6 @@
 
 Chadmin is an administration panel for ClickHouse — a real-time dashboard for monitoring running queries, managing users and access, and operating ClickHouse Cloud services. It auto-detects whether you're running a **single node**, a **self-hosted cluster**, or **ClickHouse Cloud**, and adapts the UI and SQL accordingly.
 
-
 ![Chadmin Dashboard](https://github.com/user-attachments/assets/a2541685-0b4b-433f-8cb0-3f72d6c7204f)
 
 ## Installation and Setup
@@ -54,24 +53,29 @@ docker run -d --name chadmin -p 8080:80 --env-file .env bun4uk/chadmin:latest
 ### Run via Docker Compose (development)
 
 #### Requirements
+
 - Docker and Docker Compose
 - Git
 
 #### Quick Start
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/bun4uk/chadmin.git
    cd chadmin
    ```
 
 2. Create and configure the `.env` file:
+
    ```bash
    cp .env.example .env
    ```
+
    Edit `.env` and add your ClickHouse credentials. For ClickHouse Cloud, set `CLICKHOUSE_CLOUD_KEY_ID` and `CLICKHOUSE_CLOUD_KEY_SECRET` — Cloud mode turns on automatically when these are present. See `.env.example` for the full list.
 
 3. Launch the project:
+
    ```bash
    docker-compose up -d
    ```
@@ -102,11 +106,13 @@ docker-compose exec frontend npm run build        # one-shot production build
 ### Useful Commands
 
 #### Complete shutdown of the project
+
 ```bash
 docker-compose down
 ```
 
 #### Viewing logs
+
 ```bash
 docker-compose logs -f app
 docker-compose logs -f nginx
@@ -114,6 +120,7 @@ docker-compose logs -f frontend
 ```
 
 #### Full restart with cache clearing
+
 ```bash
 docker-compose down
 rm -rf var/cache/* var/log/* public/build/*
@@ -141,4 +148,3 @@ docker-compose exec app bin/console cache:clear
 - Cloud-only: wake idle/stopped services from the UI; deep-link to a specific warehouse/service via URL params (`?warehouse=…&service=…`)
 - Light/dark theme toggle, persisted per browser
 - Polling pauses when the tab is hidden, so idle Cloud services aren't kept warm by a background tab
-
