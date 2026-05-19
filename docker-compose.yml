@@ -22,6 +22,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       target: base
+    user: "1984:1984"
     volumes:
       - .:/var/www/html
       - php-sock:/sock
@@ -31,7 +32,8 @@ services:
       - docker-net
 
   composer:
-    image: composer:latest
+    image: composer:2.9.8
+    user: "1984:1984"
     volumes:
       - .:/app
     working_dir: /app
@@ -41,6 +43,7 @@ services:
 
   frontend:
     image: node:24.15.0-alpine3.23
+    user: "1984:1984"
     volumes:
       - .:/app
     working_dir: /app
