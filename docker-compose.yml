@@ -21,7 +21,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-      target: dev
+      target: base
     volumes:
       - .:/var/www/html
       - php-sock:/sock

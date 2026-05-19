@@ -46,12 +46,10 @@ COPY --chown=chadmin:chadmin . /var/www/html
 COPY --from=vendor   --chown=chadmin:chadmin /app/vendor/      /var/www/html/vendor/
 COPY --from=frontend --chown=chadmin:chadmin /app/public/build /var/www/html/public/build
 
-# Target for php fpm mode
-FROM base AS dev
-
 COPY docker/configs/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 USER chadmin
 CMD ["php-fpm", "-F"]
+
 
 # Target for all in one image mode
 FROM base AS aio
