@@ -62,7 +62,9 @@ USER root
 RUN apk add --no-cache \
        nginx \
        supervisor \
-       && rm -rf /var/cache/apk/* /tmp/*
+ # CVE-2026-24049 — vendored wheel .dist-info is dead metadata (see vex/chadmin.openvex.json).
+ && rm -rf /usr/lib/python*/site-packages/setuptools/_vendor/wheel-*.dist-info \
+ && rm -rf /var/cache/apk/* /tmp/*
 
 # Runtime configs
 COPY docker/configs/nginx.conf /etc/nginx/nginx.conf
