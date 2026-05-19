@@ -1,0 +1,57 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://github.com/bun4uk/chadmin/blob/main/vex/chadmin.openvex.json",
+  "author": "Volodymyr Bunchuk <v.bunchuk@icloud.com>",
+  "timestamp": "2026-05-19T00:00:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "@id": "https://nvd.nist.gov/vuln/detail/CVE-2023-27482",
+        "name": "CVE-2023-27482"
+      },
+      "timestamp": "2026-05-19T00:00:00Z",
+      "products": [
+        {
+          "@id": "pkg:docker/bun4uk/chadmin",
+          "subcomponents": [
+            { "@id": "pkg:apk/alpine/supervisor" }
+          ]
+        },
+        {
+          "@id": "pkg:docker/ghcr.io/bun4uk/chadmin",
+          "subcomponents": [
+            { "@id": "pkg:apk/alpine/supervisor" }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "CVE-2023-27482 affects home-assistant/supervisor (Home Assistant add-on supervisor). Alpine's apk:supervisor packages supervisord (github.com/Supervisor/supervisor) — the Python process control system, an unrelated project that only shares the name. Scanner CPE name-collision false positive; the vulnerable code path is not present in this image."
+    },
+    {
+      "vulnerability": {
+        "@id": "https://nvd.nist.gov/vuln/detail/CVE-2026-24049",
+        "name": "CVE-2026-24049"
+      },
+      "timestamp": "2026-05-19T00:00:00Z",
+      "products": [
+        {
+          "@id": "pkg:docker/bun4uk/chadmin",
+          "subcomponents": [
+            { "@id": "pkg:apk/alpine/py3-setuptools" }
+          ]
+        },
+        {
+          "@id": "pkg:docker/ghcr.io/bun4uk/chadmin",
+          "subcomponents": [
+            { "@id": "pkg:apk/alpine/py3-setuptools" }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "wheel-0.45.1 inside py3-setuptools _vendor ships as .dist-info metadata only (METADATA, RECORD) — no .py sources, no wheel.cli.unpack module. setuptools >= 70.1 uses its own setuptools.command.bdist_wheel and does not import _vendor/wheel at runtime. The Dockerfile additionally removes the .dist-info directory to clear the scanner string match."
+    }
+  ]
+}

@@ -14,6 +14,7 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write   # cosign keyless OIDC for VEX attestation
 
 jobs:
   build-and-push:
@@ -64,6 +65,7 @@ jobs:
             org.opencontainers.image.licenses=MIT
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -75,3 +77,20 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Attach OpenVEX attestation
+        env:
+          COSIGN_YES: "true"
+        run: |
+          set -euo pipefail
+          DIGEST="${{ steps.build.outputs.digest }}"
+          for ref in "bun4uk/chadmin" "ghcr.io/${{ github.repository }}"; do
+            echo "Attesting ${ref}@${DIGEST}"
+            cosign attest \
+              --predicate vex/chadmin.openvex.json \
+              --type "https://openvex.dev/ns/v0.2.0" \
+              "${ref}@${DIGEST}"
+          done
