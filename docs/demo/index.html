@@ -1,496 +1,979 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chadmin — Live Demo</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-  <link rel="stylesheet" href="./colors_and_type.css?v=3">
-  <style>
-    /* Critical vars inlined so the kit is bulletproof even if the external CSS is cached/stale */
-    :root{
-      --ch-yellow:#faff69;
-      --bg-0:#1f1f1c; --bg-1:#262622; --bg-2:#2d2d2a; --bg-hover:#32322e;
-      --fg-1:#ffffff; --fg-2:#d4d4cf; --fg-3:#9ca3af; --fg-4:#6b7280;
-      --accent:#faff69; --accent-fg:#1f1f1c; --accent-on-surface:#faff69;
-      --border-1:#faff69; --border-2:#faff6966; --border-3:#3a3a36;
-      --font-sans:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
-      --font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    }
-    html.light{
-      --bg-0:#ffffff; --bg-1:#fafaf7; --bg-2:#f0f0ec; --bg-hover:#ebebe5;
-      --fg-1:#000000; --fg-2:#2a2a27; --fg-3:#5a5a55; --fg-4:#8a8a85;
-      --accent:#1f1f1c; --accent-fg:#ffffff; --accent-on-surface:#1f1f1c;
-      --border-1:#1f1f1c; --border-2:#1f1f1c33; --border-3:#0000001a;
-    }
-  </style>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
-  <script src="https://unpkg.com/sql-formatter@15.3.2/dist/sql-formatter.min.js"></script>
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-  <style>
-    html,body{margin:0;background:var(--bg-0);color:var(--fg-1);font-family:var(--font-sans);}
-    .light{background:#fff;color:#000;}
-    pre,code{font-family:var(--font-mono);}
-    .animate-pulse{animation:pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;}
-    @keyframes pulse{50%{opacity:.7;}}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chadmin — Live Demo</title>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../favicon-16x16.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="../apple-touch-icon.png"
+    />
+    <link rel="stylesheet" href="./colors_and_type.css?v=3" />
+    <style>
+      /* Critical vars inlined so the kit is bulletproof even if the external CSS is cached/stale */
+      :root {
+        --ch-yellow: #faff69;
+        --bg-0: #1f1f1c;
+        --bg-1: #262622;
+        --bg-2: #2d2d2a;
+        --bg-hover: #32322e;
+        --fg-1: #ffffff;
+        --fg-2: #d4d4cf;
+        --fg-3: #9ca3af;
+        --fg-4: #6b7280;
+        --accent: #faff69;
+        --accent-fg: #1f1f1c;
+        --accent-on-surface: #faff69;
+        --border-1: #faff69;
+        --border-2: #faff6966;
+        --border-3: #3a3a36;
+        --font-sans:
+          "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+        --font-mono:
+          "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      }
+      html.light {
+        --bg-0: #ffffff;
+        --bg-1: #fafaf7;
+        --bg-2: #f0f0ec;
+        --bg-hover: #ebebe5;
+        --fg-1: #000000;
+        --fg-2: #2a2a27;
+        --fg-3: #5a5a55;
+        --fg-4: #8a8a85;
+        --accent: #1f1f1c;
+        --accent-fg: #ffffff;
+        --accent-on-surface: #1f1f1c;
+        --border-1: #1f1f1c;
+        --border-2: #1f1f1c33;
+        --border-3: #0000001a;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+    <script src="https://unpkg.com/sql-formatter@15.3.2/dist/sql-formatter.min.js"></script>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: var(--bg-0);
+        color: var(--fg-1);
+        font-family: var(--font-sans);
+      }
+      .light {
+        background: #fff;
+        color: #000;
+      }
+      pre,
+      code {
+        font-family: var(--font-mono);
+      }
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.7;
+        }
+      }
 
-    /* Accent button — consistent across themes */
-    .btn-accent{
-      padding:2px 8px; border-radius:4px; font-size:14px; line-height:1.4;
-      color: var(--accent-on-surface);
-      border: 1px solid var(--accent-on-surface);
-      background: transparent;
-      cursor: pointer;
-      transition: background .15s, color .15s;
-      font-family: var(--font-sans);
-    }
-    .btn-accent:hover:not(:disabled){
-      background: var(--accent-on-surface);
-      color: var(--bg-0);
-    }
-    .btn-accent:disabled{ opacity: .5; cursor: not-allowed; }
-    .btn-accent-sm{ font-size: 12px; }
+      /* Accent button — consistent across themes */
+      .btn-accent {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 1.4;
+        color: var(--accent-on-surface);
+        border: 1px solid var(--accent-on-surface);
+        background: transparent;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+        font-family: var(--font-sans);
+      }
+      .btn-accent:hover:not(:disabled) {
+        background: var(--accent-on-surface);
+        color: var(--bg-0);
+      }
+      .btn-accent:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .btn-accent-sm {
+        font-size: 12px;
+      }
 
-    /* Native <select> — force appearance:none so our border renders */
-    select.ch-select{
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      padding: 4px 28px 4px 10px;
-      border-radius: 4px;
-      border: 1px solid var(--accent-on-surface);
-      background-color: transparent;
-      color: var(--fg-1);
-      font-size: 14px;
-      line-height: 1.4;
-      font-family: var(--font-sans);
-      cursor: pointer;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      background-size: 14px;
-    }
-    select.ch-select option{ color: #1f1f1c; background: #fff; }
+      /* Native <select> — force appearance:none so our border renders */
+      select.ch-select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding: 4px 28px 4px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--accent-on-surface);
+        background-color: transparent;
+        color: var(--fg-1);
+        font-size: 14px;
+        line-height: 1.4;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 14px;
+      }
+      select.ch-select option {
+        color: #1f1f1c;
+        background: #fff;
+      }
 
-    /* Yellow-filled brand select (warehouse / service pickers) — dark theme only */
-    select.ch-select-brand{
-      background-color: #faff69;
-      color: #1f1f1c;
-      border-color: #1f1f1c;
-    }
-    html.light select.ch-select-brand{
-      background-color: #ffffff;
-      color: #1f1f1c;
-      border-color: #1f1f1c;
-    }
+      /* Yellow-filled brand select (warehouse / service pickers) — dark theme only */
+      select.ch-select-brand {
+        background-color: #faff69;
+        color: #1f1f1c;
+        border-color: #1f1f1c;
+      }
+      html.light select.ch-select-brand {
+        background-color: #ffffff;
+        color: #1f1f1c;
+        border-color: #1f1f1c;
+      }
 
-    /* Mobile overflow guard — grid children default to min-width:auto which lets
+      /* Mobile overflow guard — grid children default to min-width:auto which lets
        long tables force the parent wider than its cell. Reset it everywhere. */
-    main, main *, section, section *{ min-width: 0; }
-    .overflow-x-auto{ max-width: 100%; }
-    /* Tile containers must stay within their grid cell */
-    main > section{ overflow: hidden; }
+      main,
+      main *,
+      section,
+      section * {
+        min-width: 0;
+      }
+      .overflow-x-auto {
+        max-width: 100%;
+      }
+      /* Tile containers must stay within their grid cell */
+      main > section {
+        overflow: hidden;
+      }
 
-    /* Danger button */
-    .btn-danger{
-      padding: 2px 8px; border-radius: 4px; font-size: 14px; line-height: 1.4;
-      color: #ff6b6b;
-      border: 1px solid #ff6b6b;
-      background: transparent;
-      cursor: pointer;
-      transition: background .15s, color .15s;
-      font-family: var(--font-sans);
-    }
-    .btn-danger:hover{ background: #ff6b6b; color: #fff; }
+      /* Danger button */
+      .btn-danger {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #ff6b6b;
+        border: 1px solid #ff6b6b;
+        background: transparent;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+        font-family: var(--font-sans);
+      }
+      .btn-danger:hover {
+        background: #ff6b6b;
+        color: #fff;
+      }
 
-    /* SQL code block — dark in dark theme, light in light theme */
-    pre.sql-pre{
-      background: #1f1f1c !important;
-      border: 1px solid #3a3a36;
-      color: #e8e8e3;
-      padding: 12px;
-      border-radius: 4px;
-      overflow: auto;
-      margin: 0;
-    }
-    pre.sql-pre code,
-    pre.sql-pre code.hljs{
-      background: transparent !important;
-      color: inherit;
-      padding: 0;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.6;
-    }
+      /* SQL code block — dark in dark theme, light in light theme */
+      pre.sql-pre {
+        background: #1f1f1c !important;
+        border: 1px solid #3a3a36;
+        color: #e8e8e3;
+        padding: 12px;
+        border-radius: 4px;
+        overflow: auto;
+        margin: 0;
+      }
+      pre.sql-pre code,
+      pre.sql-pre code.hljs {
+        background: transparent !important;
+        color: inherit;
+        padding: 0;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        line-height: 1.6;
+      }
 
-    /* Light-theme SQL recoloring — override atom-one-dark token colors with
+      /* Light-theme SQL recoloring — override atom-one-dark token colors with
        a light-on-light palette so every token has strong contrast on white. */
-    html.light pre.sql-pre{
-      background: #fafaf7 !important;
-      border-color: #d0d0c8;
-      color: #1f1f1c;
-    }
-    html.light pre.sql-pre .hljs-keyword,
-    html.light pre.sql-pre .hljs-selector-tag,
-    html.light pre.sql-pre .hljs-meta-keyword,
-    html.light pre.sql-pre .hljs-doctag,
-    html.light pre.sql-pre .hljs-section{ color: #8a2be2; font-weight: 600; }  /* purple — TABLE, SELECT, FROM */
-    html.light pre.sql-pre .hljs-built_in,
-    html.light pre.sql-pre .hljs-type,
-    html.light pre.sql-pre .hljs-title,
-    html.light pre.sql-pre .hljs-title.function_,
-    html.light pre.sql-pre .hljs-title.class_,
-    html.light pre.sql-pre .hljs-attr{ color: #004d99; }                       /* blue — functions, types, ON */
-    html.light pre.sql-pre .hljs-string,
-    html.light pre.sql-pre .hljs-regexp,
-    html.light pre.sql-pre .hljs-addition{ color: #1d6b2f; }                   /* green — strings */
-    html.light pre.sql-pre .hljs-number,
-    html.light pre.sql-pre .hljs-literal{ color: #a05a00; }                    /* amber — numbers, literals */
-    html.light pre.sql-pre .hljs-comment,
-    html.light pre.sql-pre .hljs-quote{ color: #6b6b66; font-style: italic; }
-    html.light pre.sql-pre .hljs-variable,
-    html.light pre.sql-pre .hljs-template-variable,
-    html.light pre.sql-pre .hljs-attribute{ color: #a10000; }                  /* red — variables, placeholders */
-    html.light pre.sql-pre .hljs-operator,
-    html.light pre.sql-pre .hljs-punctuation{ color: #1f1f1c; }
-  </style>
-</head>
-<body>
-<div id="root"></div>
+      html.light pre.sql-pre {
+        background: #fafaf7 !important;
+        border-color: #d0d0c8;
+        color: #1f1f1c;
+      }
+      html.light pre.sql-pre .hljs-keyword,
+      html.light pre.sql-pre .hljs-selector-tag,
+      html.light pre.sql-pre .hljs-meta-keyword,
+      html.light pre.sql-pre .hljs-doctag,
+      html.light pre.sql-pre .hljs-section {
+        color: #8a2be2;
+        font-weight: 600;
+      } /* purple — TABLE, SELECT, FROM */
+      html.light pre.sql-pre .hljs-built_in,
+      html.light pre.sql-pre .hljs-type,
+      html.light pre.sql-pre .hljs-title,
+      html.light pre.sql-pre .hljs-title.function_,
+      html.light pre.sql-pre .hljs-title.class_,
+      html.light pre.sql-pre .hljs-attr {
+        color: #004d99;
+      } /* blue — functions, types, ON */
+      html.light pre.sql-pre .hljs-string,
+      html.light pre.sql-pre .hljs-regexp,
+      html.light pre.sql-pre .hljs-addition {
+        color: #1d6b2f;
+      } /* green — strings */
+      html.light pre.sql-pre .hljs-number,
+      html.light pre.sql-pre .hljs-literal {
+        color: #a05a00;
+      } /* amber — numbers, literals */
+      html.light pre.sql-pre .hljs-comment,
+      html.light pre.sql-pre .hljs-quote {
+        color: #6b6b66;
+        font-style: italic;
+      }
+      html.light pre.sql-pre .hljs-variable,
+      html.light pre.sql-pre .hljs-template-variable,
+      html.light pre.sql-pre .hljs-attribute {
+        color: #a10000;
+      } /* red — variables, placeholders */
+      html.light pre.sql-pre .hljs-operator,
+      html.light pre.sql-pre .hljs-punctuation {
+        color: #1f1f1c;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
 
-<script type="text/babel" src="Toast.jsx?v=6"></script>
-<script type="text/babel" src="StateBadge.jsx?v=6"></script>
-<script type="text/babel" src="ConfirmDialog.jsx?v=6"></script>
-<script type="text/babel" src="QueryModal.jsx?v=6"></script>
-<script type="text/babel" src="MemoryPopover.jsx?v=6"></script>
-<script type="text/babel" src="UserPopover.jsx?v=6"></script>
-<script type="text/babel" src="TargetTile.jsx?v=6"></script>
-<script type="text/babel" src="UsersTable.jsx?v=6"></script>
-<script type="text/babel" src="Shell.jsx?v=6"></script>
+    <script type="text/babel" src="Toast.jsx?v=6"></script>
+    <script type="text/babel" src="StateBadge.jsx?v=6"></script>
+    <script type="text/babel" src="ConfirmDialog.jsx?v=6"></script>
+    <script type="text/babel" src="QueryModal.jsx?v=6"></script>
+    <script type="text/babel" src="MemoryPopover.jsx?v=6"></script>
+    <script type="text/babel" src="UserPopover.jsx?v=6"></script>
+    <script type="text/babel" src="TargetTile.jsx?v=6"></script>
+    <script type="text/babel" src="UsersTable.jsx?v=6"></script>
+    <script type="text/babel" src="Shell.jsx?v=6"></script>
 
-<script type="text/babel">
-// ---------- Mock fixtures ----------
-const SAMPLE_SQL = {
-  a: `SELECT event_type, count() AS c, avg(duration_ms) AS avg_dur
+    <script type="text/babel">
+      // ---------- Mock fixtures ----------
+      const SAMPLE_SQL = {
+        a: `SELECT event_type, count() AS c, avg(duration_ms) AS avg_dur
 FROM events
 WHERE event_date >= toDate(now() - interval 7 day)
   AND user_id IN (1001, 1002, 1003)
 GROUP BY event_type
 ORDER BY c DESC
 LIMIT 100`,
-  b: `INSERT INTO analytics.hourly_rollup
+        b: `INSERT INTO analytics.hourly_rollup
 SELECT toStartOfHour(event_time) AS h, country, count() AS hits
 FROM events_raw WHERE event_date = today()
 GROUP BY h, country`,
-  c: `SELECT max(event_time) AS maxDataTime, now() - INTERVAL 600 SECOND AS maxSettlePoint
+        c: `SELECT max(event_time) AS maxDataTime, now() - INTERVAL 600 SECOND AS maxSettlePoint
 FROM text_log_2
 WHERE event_date >= toDate(now() - interval 21600 second)
   AND event_time >= now() - interval 21600 second
   AND event_time < maxSettlePoint`,
-  d: `OPTIMIZE TABLE mart.user_sessions_distributed ON CLUSTER '{cluster}' FINAL`,
-};
+        d: `OPTIMIZE TABLE mart.user_sessions_distributed ON CLUSTER '{cluster}' FINAL`,
+      };
 
-const mkProc = (id, user, elapsed, memMiB, sql, peakMiB = memMiB*1.3) => ({
-  query_id: id, user, elapsed, query: sql,
-  memory_usage: memMiB*1024*1024, formatted_memory_usage: memMiB >= 1024 ? (memMiB/1024).toFixed(2)+' GiB' : memMiB+' MiB',
-  peak_memory: peakMiB*1024*1024, formatted_peak_memory: peakMiB+' MiB', formatted_peak_memory_usage: peakMiB >= 1024 ? (peakMiB/1024).toFixed(2)+' GiB' : peakMiB+' MiB',
-  read_bytes: 0, formatted_read_bytes: (memMiB*4)+' MiB',
-  written_bytes: 0, formatted_written_bytes: memMiB > 100 ? (memMiB/2)+' MiB' : '-',
-  read_rows: memMiB*1200, written_rows: 0,
-});
+      const mkProc = (
+        id,
+        user,
+        elapsed,
+        memMiB,
+        sql,
+        peakMiB = memMiB * 1.3,
+      ) => ({
+        query_id: id,
+        user,
+        elapsed,
+        query: sql,
+        memory_usage: memMiB * 1024 * 1024,
+        formatted_memory_usage:
+          memMiB >= 1024
+            ? (memMiB / 1024).toFixed(2) + " GiB"
+            : memMiB + " MiB",
+        peak_memory: peakMiB * 1024 * 1024,
+        formatted_peak_memory: peakMiB + " MiB",
+        formatted_peak_memory_usage:
+          peakMiB >= 1024
+            ? (peakMiB / 1024).toFixed(2) + " GiB"
+            : peakMiB + " MiB",
+        read_bytes: 0,
+        formatted_read_bytes: memMiB * 4 + " MiB",
+        written_bytes: 0,
+        formatted_written_bytes: memMiB > 100 ? memMiB / 2 + " MiB" : "-",
+        read_rows: memMiB * 1200,
+        written_rows: 0,
+      });
 
-const MEM_METRICS = {
-  CGroupMemoryTotal: { fqdn: '', metric: 'CGroupMemoryTotal', bytes: 16*1024*1024*1024, readable_size: '16.00 GiB' },
-  CGroupMemoryUsed:  { fqdn: '', metric: 'CGroupMemoryUsed',  bytes: 6.4*1024*1024*1024, readable_size: '6.40 GiB' },
-  OSMemoryTotal:     { fqdn: '', metric: 'OSMemoryTotal',     bytes: 32*1024*1024*1024, readable_size: '32.00 GiB' },
-  MemoryResident:    { fqdn: '', metric: 'MemoryResident',    bytes: 6.4*1024*1024*1024, readable_size: '6.40 GiB' },
-};
+      const MEM_METRICS = {
+        CGroupMemoryTotal: {
+          fqdn: "",
+          metric: "CGroupMemoryTotal",
+          bytes: 16 * 1024 * 1024 * 1024,
+          readable_size: "16.00 GiB",
+        },
+        CGroupMemoryUsed: {
+          fqdn: "",
+          metric: "CGroupMemoryUsed",
+          bytes: 6.4 * 1024 * 1024 * 1024,
+          readable_size: "6.40 GiB",
+        },
+        OSMemoryTotal: {
+          fqdn: "",
+          metric: "OSMemoryTotal",
+          bytes: 32 * 1024 * 1024 * 1024,
+          readable_size: "32.00 GiB",
+        },
+        MemoryResident: {
+          fqdn: "",
+          metric: "MemoryResident",
+          bytes: 6.4 * 1024 * 1024 * 1024,
+          readable_size: "6.40 GiB",
+        },
+      };
 
-const TOPOLOGIES = {
-  cloud: {
-    mode: 'cloud',
-    organization: { id: 'org-1', name: 'Talvi' },
-    warehouseId: 'wh-ingest',
-    fetchedAt: new Date().toISOString(),
-    targets: [
-      { id: 't-ingest', name: 'ingest', warehouseId: 'wh-ingest', warehouseName: 'Ingest', state: 'running', queryable: true, mode: 'cloud', numReplicas: 2, minMemoryGb: 16, maxMemoryGb: 32, region: 'us-east-2', provider: 'aws', isPrimary: true, clickhouseVersion: '25.12' },
-      { id: 't-replica', name: 'ingest-replica', warehouseId: 'wh-ingest', warehouseName: 'Ingest', state: 'running', queryable: true, mode: 'cloud', numReplicas: 2, minMemoryGb: 16, maxMemoryGb: 32, region: 'us-east-2', provider: 'aws', isPrimary: false, clickhouseVersion: '25.12' },
-      { id: 't-analytics', name: 'analytics', warehouseId: 'wh-analytics', warehouseName: 'Analytics', state: 'idle', queryable: false, mode: 'cloud', numReplicas: 3, minMemoryGb: 32, maxMemoryGb: 64, region: 'eu-west-1', provider: 'aws', isPrimary: true, clickhouseVersion: '25.12' },
-      { id: 't-reports', name: 'reports', warehouseId: 'wh-analytics', warehouseName: 'Analytics', state: 'stopped', queryable: false, mode: 'cloud', numReplicas: 1, minMemoryGb: 16, maxMemoryGb: 16, region: 'eu-west-1', provider: 'aws', isPrimary: false, clickhouseVersion: '25.12' },
-      { id: 't-exp', name: 'experiments', warehouseId: 'wh-exp', warehouseName: 'Experiments', state: 'degraded', queryable: true, mode: 'cloud', numReplicas: 2, minMemoryGb: 8, maxMemoryGb: 8, region: 'us-west-2', provider: 'aws', isPrimary: true, clickhouseVersion: '24.8.1' },
-    ],
-  },
-  cluster: {
-    mode: 'cluster', organization: null, warehouseId: null, fetchedAt: new Date().toISOString(),
-    targets: [
-      { id: 't-c01', name: 'ch-cluster-shard1-r1', state: 'running', queryable: true, mode: 'cluster', numReplicas: null, minMemoryGb: null, maxMemoryGb: null, region: null, provider: null, warehouseId: null, isPrimary: null, clickhouseVersion: '24.8.1' },
-      { id: 't-c02', name: 'ch-cluster-shard1-r2', state: 'running', queryable: true, mode: 'cluster', numReplicas: null, minMemoryGb: null, maxMemoryGb: null, region: null, provider: null, warehouseId: null, isPrimary: null, clickhouseVersion: '24.8.1' },
-      { id: 't-c03', name: 'ch-cluster-shard2-r1', state: 'partiallyRunning', queryable: true, mode: 'cluster', numReplicas: null, minMemoryGb: null, maxMemoryGb: null, region: null, provider: null, warehouseId: null, isPrimary: null, clickhouseVersion: '24.8.1' },
-    ],
-  },
-  single: {
-    mode: 'single', organization: null, warehouseId: null, fetchedAt: new Date().toISOString(),
-    targets: [{ id: 't-s1', name: 'ch-primary', state: 'running', queryable: true, mode: 'single', numReplicas: null, minMemoryGb: null, maxMemoryGb: null, region: null, provider: null, warehouseId: null, isPrimary: null, clickhouseVersion: '24.8.1' }],
-  },
-};
+      const TOPOLOGIES = {
+        cloud: {
+          mode: "cloud",
+          organization: { id: "org-1", name: "Talvi" },
+          warehouseId: "wh-ingest",
+          fetchedAt: new Date().toISOString(),
+          targets: [
+            {
+              id: "t-ingest",
+              name: "ingest",
+              warehouseId: "wh-ingest",
+              warehouseName: "Warehouse 1",
+              state: "running",
+              queryable: true,
+              mode: "cloud",
+              numReplicas: 2,
+              minMemoryGb: 16,
+              maxMemoryGb: 32,
+              region: "us-east-2",
+              provider: "aws",
+              isPrimary: true,
+              clickhouseVersion: "25.12",
+            },
+            {
+              id: "t-replica",
+              name: "ingest-replica",
+              warehouseId: "wh-ingest",
+              warehouseName: "Warehouse 1",
+              state: "running",
+              queryable: true,
+              mode: "cloud",
+              numReplicas: 2,
+              minMemoryGb: 16,
+              maxMemoryGb: 32,
+              region: "us-east-2",
+              provider: "aws",
+              isPrimary: false,
+              clickhouseVersion: "25.12",
+            },
+            {
+              id: "t-analytics",
+              name: "analytics",
+              warehouseId: "wh-analytics",
+              warehouseName: "Warehouse 2",
+              state: "idle",
+              queryable: false,
+              mode: "cloud",
+              numReplicas: 3,
+              minMemoryGb: 32,
+              maxMemoryGb: 64,
+              region: "eu-west-1",
+              provider: "aws",
+              isPrimary: true,
+              clickhouseVersion: "25.12",
+            },
+            {
+              id: "t-reports",
+              name: "reports",
+              warehouseId: "wh-analytics",
+              warehouseName: "Warehouse 2",
+              state: "stopped",
+              queryable: false,
+              mode: "cloud",
+              numReplicas: 1,
+              minMemoryGb: 16,
+              maxMemoryGb: 16,
+              region: "eu-west-1",
+              provider: "aws",
+              isPrimary: false,
+              clickhouseVersion: "25.12",
+            },
+            {
+              id: "t-exp",
+              name: "experiments",
+              warehouseId: "wh-exp",
+              warehouseName: "Experiments WH",
+              state: "degraded",
+              queryable: true,
+              mode: "cloud",
+              numReplicas: 2,
+              minMemoryGb: 8,
+              maxMemoryGb: 8,
+              region: "us-west-2",
+              provider: "aws",
+              isPrimary: true,
+              clickhouseVersion: "24.8.1",
+            },
+          ],
+        },
+        cluster: {
+          mode: "cluster",
+          organization: null,
+          warehouseId: null,
+          fetchedAt: new Date().toISOString(),
+          targets: [
+            {
+              id: "t-c01",
+              name: "ch-cluster-shard1-r1",
+              state: "running",
+              queryable: true,
+              mode: "cluster",
+              numReplicas: null,
+              minMemoryGb: null,
+              maxMemoryGb: null,
+              region: null,
+              provider: null,
+              warehouseId: null,
+              isPrimary: null,
+              clickhouseVersion: "24.8.1",
+            },
+            {
+              id: "t-c02",
+              name: "ch-cluster-shard1-r2",
+              state: "running",
+              queryable: true,
+              mode: "cluster",
+              numReplicas: null,
+              minMemoryGb: null,
+              maxMemoryGb: null,
+              region: null,
+              provider: null,
+              warehouseId: null,
+              isPrimary: null,
+              clickhouseVersion: "24.8.1",
+            },
+            {
+              id: "t-c03",
+              name: "ch-cluster-shard2-r1",
+              state: "partiallyRunning",
+              queryable: true,
+              mode: "cluster",
+              numReplicas: null,
+              minMemoryGb: null,
+              maxMemoryGb: null,
+              region: null,
+              provider: null,
+              warehouseId: null,
+              isPrimary: null,
+              clickhouseVersion: "24.8.1",
+            },
+          ],
+        },
+        single: {
+          mode: "single",
+          organization: null,
+          warehouseId: null,
+          fetchedAt: new Date().toISOString(),
+          targets: [
+            {
+              id: "t-s1",
+              name: "ch-primary",
+              state: "running",
+              queryable: true,
+              mode: "single",
+              numReplicas: null,
+              minMemoryGb: null,
+              maxMemoryGb: null,
+              region: null,
+              provider: null,
+              warehouseId: null,
+              isPrimary: null,
+              clickhouseVersion: "24.8.1",
+            },
+          ],
+        },
+      };
 
-function buildData(targetId) {
-  if (targetId === 't-ingest') {
-    return { cluster: null, processes: {
-      'c-ingest-0.internal.svc.cluster.local': [
-        mkProc('c9b447c3-ac41-484a-9f0c-b247e10b1e40', 'observability_internal', 17, 21, SAMPLE_SQL.c),
-        mkProc('a1b2c3d4-ef56-7890-1234-567890abcdef', 'default', 12, 256, SAMPLE_SQL.a),
-        mkProc('bd88f210-1122-3344-5566-778899aabbcc', 'analytics_ro', 105, 1843, SAMPLE_SQL.b),
-      ],
-    }, memory_metrics: { 'c-ingest-0.internal.svc.cluster.local': MEM_METRICS }};
-  }
-  if (targetId === 't-replica') {
-    return { cluster: null, processes: {
-      'c-ingest-1.internal.svc.cluster.local': [ mkProc('ffee1234-5566-7788-99aa-bbccddeeff00', 'etl_worker', 492, 6554, SAMPLE_SQL.d) ],
-    }, memory_metrics: { 'c-ingest-1.internal.svc.cluster.local': { ...MEM_METRICS, CGroupMemoryUsed: { ...MEM_METRICS.CGroupMemoryUsed, bytes: 12.8*1024*1024*1024, readable_size: '12.80 GiB' }}}};
-  }
-  if (targetId === 't-exp') {
-    return { cluster: null, processes: {
-      'c-exp-0.internal': [ mkProc('eeee0000-1111-2222-3333-444455556666', 'tester', 4, 128, SAMPLE_SQL.a) ],
-    }, memory_metrics: { 'c-exp-0.internal': { ...MEM_METRICS, CGroupMemoryUsed: { ...MEM_METRICS.CGroupMemoryUsed, bytes: 13.2*1024*1024*1024, readable_size: '13.20 GiB' }}}};
-  }
-  if (targetId === 't-c01' || targetId === 't-c02' || targetId === 't-c03') {
-    return { cluster: 'main', processes: {
-      [targetId.replace('t-c0', 'shard') + '.cluster']: [
-        mkProc('c01-' + targetId, 'ingest', 22 + (targetId.charCodeAt(4)%30), 512, SAMPLE_SQL.b),
-      ],
-    }, memory_metrics: { [targetId.replace('t-c0', 'shard') + '.cluster']: MEM_METRICS }};
-  }
-  if (targetId === 't-s1') {
-    return { cluster: null, processes: {
-      'ch-primary.local': [
-        mkProc('ssss-1111-2222', 'default', 6, 64, SAMPLE_SQL.a),
-        mkProc('ssss-3333-4444', 'analyst', 88, 820, SAMPLE_SQL.b),
-      ],
-    }, memory_metrics: { 'ch-primary.local': MEM_METRICS }};
-  }
-  return { cluster: null, processes: {}, memory_metrics: {} };
-}
+      function buildData(targetId) {
+        if (targetId === "t-ingest") {
+          return {
+            cluster: null,
+            processes: {
+              "c-ingest-0.internal.svc.cluster.local": [
+                mkProc(
+                  "c9b447c3-ac41-484a-9f0c-b247e10b1e40",
+                  "observability_internal",
+                  17,
+                  21,
+                  SAMPLE_SQL.c,
+                ),
+                mkProc(
+                  "a1b2c3d4-ef56-7890-1234-567890abcdef",
+                  "default",
+                  12,
+                  256,
+                  SAMPLE_SQL.a,
+                ),
+                mkProc(
+                  "bd88f210-1122-3344-5566-778899aabbcc",
+                  "analytics_ro",
+                  105,
+                  1843,
+                  SAMPLE_SQL.b,
+                ),
+              ],
+            },
+            memory_metrics: {
+              "c-ingest-0.internal.svc.cluster.local": MEM_METRICS,
+            },
+          };
+        }
+        if (targetId === "t-replica") {
+          return {
+            cluster: null,
+            processes: {
+              "c-ingest-1.internal.svc.cluster.local": [
+                mkProc(
+                  "ffee1234-5566-7788-99aa-bbccddeeff00",
+                  "etl_worker",
+                  492,
+                  6554,
+                  SAMPLE_SQL.d,
+                ),
+              ],
+            },
+            memory_metrics: {
+              "c-ingest-1.internal.svc.cluster.local": {
+                ...MEM_METRICS,
+                CGroupMemoryUsed: {
+                  ...MEM_METRICS.CGroupMemoryUsed,
+                  bytes: 12.8 * 1024 * 1024 * 1024,
+                  readable_size: "12.80 GiB",
+                },
+              },
+            },
+          };
+        }
+        if (targetId === "t-exp") {
+          return {
+            cluster: null,
+            processes: {
+              "c-exp-0.internal": [
+                mkProc(
+                  "eeee0000-1111-2222-3333-444455556666",
+                  "tester",
+                  4,
+                  128,
+                  SAMPLE_SQL.a,
+                ),
+              ],
+            },
+            memory_metrics: {
+              "c-exp-0.internal": {
+                ...MEM_METRICS,
+                CGroupMemoryUsed: {
+                  ...MEM_METRICS.CGroupMemoryUsed,
+                  bytes: 13.2 * 1024 * 1024 * 1024,
+                  readable_size: "13.20 GiB",
+                },
+              },
+            },
+          };
+        }
+        if (
+          targetId === "t-c01" ||
+          targetId === "t-c02" ||
+          targetId === "t-c03"
+        ) {
+          return {
+            cluster: "main",
+            processes: {
+              [targetId.replace("t-c0", "shard") + ".cluster"]: [
+                mkProc(
+                  "c01-" + targetId,
+                  "ingest",
+                  22 + (targetId.charCodeAt(4) % 30),
+                  512,
+                  SAMPLE_SQL.b,
+                ),
+              ],
+            },
+            memory_metrics: {
+              [targetId.replace("t-c0", "shard") + ".cluster"]: MEM_METRICS,
+            },
+          };
+        }
+        if (targetId === "t-s1") {
+          return {
+            cluster: null,
+            processes: {
+              "ch-primary.local": [
+                mkProc("ssss-1111-2222", "default", 6, 64, SAMPLE_SQL.a),
+                mkProc("ssss-3333-4444", "analyst", 88, 820, SAMPLE_SQL.b),
+              ],
+            },
+            memory_metrics: { "ch-primary.local": MEM_METRICS },
+          };
+        }
+        return { cluster: null, processes: {}, memory_metrics: {} };
+      }
 
-const USERS_FIXTURE = {
-  users: [
-    { name: 'default', last_query_at: '2026-04-23T10:12:04' },
-    { name: 'analytics_ro', last_query_at: '2026-04-23T10:15:44' },
-    { name: 'etl_worker', last_query_at: '2026-04-22T23:01:10' },
-    { name: 'observability_internal', last_query_at: '2026-04-23T10:15:56' },
-    { name: 'archived_user', last_query_at: null },
-  ],
-  roles: [{ name: 'readonly' }, { name: 'writer' }, { name: 'admin' }],
-  user_roles: [
-    { user_name: 'default', role_name: 'admin' },
-    { user_name: 'analytics_ro', role_name: 'readonly' },
-    { user_name: 'etl_worker', role_name: 'writer' },
-  ],
-  user_grants: [
-    { user_name: 'observability_internal', access_type: 'SELECT', database: 'system', table_name: null, column: null },
-    { user_name: 'observability_internal', access_type: 'SELECT', database: 'text_log_2', table_name: null, column: null },
-    { user_name: 'analytics_ro', access_type: 'SELECT', database: 'events', table_name: null, column: null },
-  ],
-  role_grants: [
-    { role_name: 'readonly', access_type: 'SELECT', database: '*', table_name: null, column: null },
-    { role_name: 'writer', access_type: 'INSERT', database: '*', table_name: null, column: null },
-    { role_name: 'admin', access_type: 'ALL', database: '*', table_name: null, column: null },
-  ],
-};
+      const USERS_FIXTURE = {
+        users: [
+          { name: "default", last_query_at: "2026-04-23T10:12:04" },
+          { name: "analytics_ro", last_query_at: "2026-04-23T10:15:44" },
+          { name: "etl_worker", last_query_at: "2026-04-22T23:01:10" },
+          {
+            name: "observability_internal",
+            last_query_at: "2026-04-23T10:15:56",
+          },
+          { name: "archived_user", last_query_at: null },
+        ],
+        roles: [{ name: "readonly" }, { name: "writer" }, { name: "admin" }],
+        user_roles: [
+          { user_name: "default", role_name: "admin" },
+          { user_name: "analytics_ro", role_name: "readonly" },
+          { user_name: "etl_worker", role_name: "writer" },
+        ],
+        user_grants: [
+          {
+            user_name: "observability_internal",
+            access_type: "SELECT",
+            database: "system",
+            table_name: null,
+            column: null,
+          },
+          {
+            user_name: "observability_internal",
+            access_type: "SELECT",
+            database: "text_log_2",
+            table_name: null,
+            column: null,
+          },
+          {
+            user_name: "analytics_ro",
+            access_type: "SELECT",
+            database: "events",
+            table_name: null,
+            column: null,
+          },
+        ],
+        role_grants: [
+          {
+            role_name: "readonly",
+            access_type: "SELECT",
+            database: "*",
+            table_name: null,
+            column: null,
+          },
+          {
+            role_name: "writer",
+            access_type: "INSERT",
+            database: "*",
+            table_name: null,
+            column: null,
+          },
+          {
+            role_name: "admin",
+            access_type: "ALL",
+            database: "*",
+            table_name: null,
+            column: null,
+          },
+        ],
+      };
 
-// ---------- App ----------
-function App() {
-  const [theme, setTheme] = React.useState(() => localStorage.getItem('theme') || 'dark');
-  React.useEffect(() => {
-    document.documentElement.classList.toggle('light', theme === 'light');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+      // ---------- App ----------
+      function App() {
+        const [theme, setTheme] = React.useState(
+          () => localStorage.getItem("theme") || "dark",
+        );
+        React.useEffect(() => {
+          document.documentElement.classList.toggle("light", theme === "light");
+          localStorage.setItem("theme", theme);
+        }, [theme]);
 
-  const [topoMode, setTopoMode] = React.useState(() => localStorage.getItem('topoMode') || 'cloud');
-  React.useEffect(() => { localStorage.setItem('topoMode', topoMode); }, [topoMode]);
+        const [topoMode, setTopoMode] = React.useState(
+          () => localStorage.getItem("topoMode") || "cloud",
+        );
+        React.useEffect(() => {
+          localStorage.setItem("topoMode", topoMode);
+        }, [topoMode]);
 
-  const [page, setPage] = React.useState(() => localStorage.getItem('page') || 'query');
-  React.useEffect(() => { localStorage.setItem('page', page); }, [page]);
+        const [page, setPage] = React.useState(
+          () => localStorage.getItem("page") || "query",
+        );
+        React.useEffect(() => {
+          localStorage.setItem("page", page);
+        }, [page]);
 
-  const topology = TOPOLOGIES[topoMode];
+        const topology = TOPOLOGIES[topoMode];
 
-  const [selectedTargetId, setSelectedTargetId] = React.useState(topology.targets[0].id);
-  React.useEffect(() => { setSelectedTargetId(topology.targets[0].id); }, [topoMode]);
+        const [selectedTargetId, setSelectedTargetId] = React.useState(
+          topology.targets[0].id,
+        );
+        React.useEffect(() => {
+          setSelectedTargetId(topology.targets[0].id);
+        }, [topoMode]);
 
-  const [intervalSec, setIntervalSec] = React.useState(30);
-  const [autoRefresh, setAutoRefresh] = React.useState(true);
-  const [timeLeft, setTimeLeft] = React.useState(30);
-  const [isRefreshing, setRefreshing] = React.useState(false);
-  const [refreshKey, setRefreshKey] = React.useState(0);
-  const isVisible = true;
+        const [intervalSec, setIntervalSec] = React.useState(30);
+        const [autoRefresh, setAutoRefresh] = React.useState(true);
+        const [timeLeft, setTimeLeft] = React.useState(30);
+        const [isRefreshing, setRefreshing] = React.useState(false);
+        const [refreshKey, setRefreshKey] = React.useState(0);
+        const isVisible = true;
 
-  React.useEffect(() => setTimeLeft(intervalSec), [intervalSec, refreshKey]);
-  React.useEffect(() => {
-    if (!autoRefresh) return;
-    const id = setInterval(() => setTimeLeft(t => t > 0 ? t - 1 : t), 1000);
-    return () => clearInterval(id);
-  }, [autoRefresh]);
-  React.useEffect(() => {
-    if (!autoRefresh) return;
-    const id = setInterval(() => doRefresh(), intervalSec * 1000);
-    return () => clearInterval(id);
-  }, [autoRefresh, intervalSec]);
+        React.useEffect(
+          () => setTimeLeft(intervalSec),
+          [intervalSec, refreshKey],
+        );
+        React.useEffect(() => {
+          if (!autoRefresh) return;
+          const id = setInterval(
+            () => setTimeLeft((t) => (t > 0 ? t - 1 : t)),
+            1000,
+          );
+          return () => clearInterval(id);
+        }, [autoRefresh]);
+        React.useEffect(() => {
+          if (!autoRefresh) return;
+          const id = setInterval(() => doRefresh(), intervalSec * 1000);
+          return () => clearInterval(id);
+        }, [autoRefresh, intervalSec]);
 
-  const doRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => { setRefreshing(false); setRefreshKey(k => k + 1); }, 500);
-  };
+        const doRefresh = () => {
+          setRefreshing(true);
+          setTimeout(() => {
+            setRefreshing(false);
+            setRefreshKey((k) => k + 1);
+          }, 500);
+        };
 
-  const visibleTargets = topology.mode === 'cloud'
-    ? topology.targets.filter(t => t.id === selectedTargetId)
-    : topology.targets;
+        const visibleTargets =
+          topology.mode === "cloud"
+            ? topology.targets.filter((t) => t.id === selectedTargetId)
+            : topology.targets;
 
-  const [killingIds, setKillingIds] = React.useState(new Set());
-  const [wakingIds, setWakingIds] = React.useState(new Set());
-  const [wakeConfirmTarget, setWakeConfirmTarget] = React.useState(null);
-  const [queryModal, setQueryModal] = React.useState(null);
-  const [memPopover, setMemPopover] = React.useState(null);
-  const [userPopover, setUserPopover] = React.useState(null);
+        const [killingIds, setKillingIds] = React.useState(new Set());
+        const [wakingIds, setWakingIds] = React.useState(new Set());
+        const [wakeConfirmTarget, setWakeConfirmTarget] = React.useState(null);
+        const [queryModal, setQueryModal] = React.useState(null);
+        const [memPopover, setMemPopover] = React.useState(null);
+        const [userPopover, setUserPopover] = React.useState(null);
 
-  const onKill = (qid, tid) => {
-    setKillingIds(s => new Set(s).add(qid));
-    setTimeout(() => {
-      toastRef.current?.('Query ' + qid.slice(0, 8) + ' stopped', 'success');
-      setKillingIds(s => { const n = new Set(s); n.delete(qid); return n; });
-    }, 900);
-  };
+        const onKill = (qid, tid) => {
+          setKillingIds((s) => new Set(s).add(qid));
+          setTimeout(() => {
+            toastRef.current?.(
+              "Query " + qid.slice(0, 8) + " stopped",
+              "success",
+            );
+            setKillingIds((s) => {
+              const n = new Set(s);
+              n.delete(qid);
+              return n;
+            });
+          }, 900);
+        };
 
-  const onWake = (tid) => {
-    const t = topology.targets.find(x => x.id === tid);
-    setWakeConfirmTarget(t);
-  };
+        const onWake = (tid) => {
+          const t = topology.targets.find((x) => x.id === tid);
+          setWakeConfirmTarget(t);
+        };
 
-  const performWake = () => {
-    const t = wakeConfirmTarget;
-    setWakeConfirmTarget(null);
-    setWakingIds(s => new Set(s).add(t.id));
-    toastRef.current?.('Wake signal sent', 'success');
-  };
+        const performWake = () => {
+          const t = wakeConfirmTarget;
+          setWakeConfirmTarget(null);
+          setWakingIds((s) => new Set(s).add(t.id));
+          toastRef.current?.("Wake signal sent", "success");
+        };
 
-  const toastRef = React.useRef(null);
-  const ToastInjector = () => {
-    const { addToast } = window.useToast();
-    React.useEffect(() => { toastRef.current = addToast; }, [addToast]);
-    return null;
-  };
+        const toastRef = React.useRef(null);
+        const ToastInjector = () => {
+          const { addToast } = window.useToast();
+          React.useEffect(() => {
+            toastRef.current = addToast;
+          }, [addToast]);
+          return null;
+        };
 
-  const [deleteUser, setDeleteUser] = React.useState(null);
+        const [deleteUser, setDeleteUser] = React.useState(null);
 
-  return (
-    <window.ToastProvider>
-      <ToastInjector />
-      <window.Shell
-        topology={topology}
-        selectedTargetId={selectedTargetId}
-        onSelectTarget={setSelectedTargetId}
-        intervalSec={intervalSec}
-        onIntervalChange={setIntervalSec}
-        autoRefresh={autoRefresh}
-        onAutoChange={setAutoRefresh}
-        timeLeft={timeLeft}
-        isVisible={isVisible}
-        isRefreshing={isRefreshing}
-        onRefresh={doRefresh}
-        theme={theme}
-        onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-        currentPage={page}
-        onNavigate={setPage}
-      />
-
-      {page === 'query' && (
-        <main className={(isRefreshing ? 'animate-pulse ' : '') + 'grid gap-4 p-2 sm:p-4 grid-cols-1'}>
-          {visibleTargets.map(t => (
-            <window.TargetTile
-              key={t.id + refreshKey}
-              target={t}
-              data={t.queryable ? buildData(t.id) : { sleeping: true, processes: {} }}
-              killingIds={killingIds}
-              wakingIds={wakingIds}
-              onKill={onKill}
-              onWake={onWake}
-              onOpenQuery={(p) => setQueryModal({ id: p.query_id, sql: p.query })}
-              onOpenMemory={(p, anchor) => setMemPopover({ proc: p, anchor })}
-              onOpenUser={(p, anchor) => setUserPopover({ proc: p, anchor })}
+        return (
+          <window.ToastProvider>
+            <ToastInjector />
+            <window.Shell
+              topology={topology}
+              selectedTargetId={selectedTargetId}
+              onSelectTarget={setSelectedTargetId}
+              intervalSec={intervalSec}
+              onIntervalChange={setIntervalSec}
+              autoRefresh={autoRefresh}
+              onAutoChange={setAutoRefresh}
+              timeLeft={timeLeft}
+              isVisible={isVisible}
+              isRefreshing={isRefreshing}
+              onRefresh={doRefresh}
               theme={theme}
+              onThemeToggle={() =>
+                setTheme((t) => (t === "dark" ? "light" : "dark"))
+              }
+              currentPage={page}
+              onNavigate={setPage}
             />
-          ))}
-        </main>
-      )}
 
-      {page === 'users' && (
-        <main className="p-2 sm:p-4 flex flex-col gap-4">
-          <window.UsersTable
-            data={USERS_FIXTURE}
-            onDelete={(u) => setDeleteUser(u)}
-          />
-        </main>
-      )}
+            {page === "query" && (
+              <main
+                className={
+                  (isRefreshing ? "animate-pulse " : "") +
+                  "grid gap-4 p-2 sm:p-4 grid-cols-1"
+                }
+              >
+                {visibleTargets.map((t) => (
+                  <window.TargetTile
+                    key={t.id + refreshKey}
+                    target={t}
+                    data={
+                      t.queryable
+                        ? buildData(t.id)
+                        : { sleeping: true, processes: {} }
+                    }
+                    killingIds={killingIds}
+                    wakingIds={wakingIds}
+                    onKill={onKill}
+                    onWake={onWake}
+                    onOpenQuery={(p) =>
+                      setQueryModal({ id: p.query_id, sql: p.query })
+                    }
+                    onOpenMemory={(p, anchor) =>
+                      setMemPopover({ proc: p, anchor })
+                    }
+                    onOpenUser={(p, anchor) =>
+                      setUserPopover({ proc: p, anchor })
+                    }
+                    theme={theme}
+                  />
+                ))}
+              </main>
+            )}
 
-      {wakeConfirmTarget && (
-        <window.ConfirmDialog
-          title="Wake service?"
-          message={`Send wake signal to "${wakeConfirmTarget.name}" (currently ${wakeConfirmTarget.state})?\n\nClickHouse Cloud may take a few minutes to bring the service online.`}
-          confirmLabel="Wake"
-          onConfirm={performWake}
-          onCancel={() => setWakeConfirmTarget(null)}
-        />
-      )}
-      {queryModal && (
-        <window.QueryModal
-          queryId={queryModal.id}
-          sql={queryModal.sql}
-          onClose={() => setQueryModal(null)}
-          onKill={onKill}
-        />
-      )}
-      {memPopover && (
-        <window.MemoryPopover
-          proc={memPopover.proc}
-          anchor={memPopover.anchor}
-          onClose={() => setMemPopover(null)}
-        />
-      )}
-      {userPopover && (
-        <window.UserPopover
-          proc={userPopover.proc}
-          anchor={userPopover.anchor}
-          onClose={() => setUserPopover(null)}
-        />
-      )}
-      {deleteUser && (
-        <window.ConfirmDialog
-          title="Delete user?"
-          message={`Delete user "${deleteUser}" on target "${topology.targets[0].name}"?`}
-          confirmLabel="Delete"
-          danger
-          onConfirm={() => { toastRef.current?.('User ' + deleteUser + ' deleted', 'success'); setDeleteUser(null); }}
-          onCancel={() => setDeleteUser(null)}
-        />
-      )}
-    </window.ToastProvider>
-  );
-}
+            {page === "users" && (
+              <main className="p-2 sm:p-4 flex flex-col gap-4">
+                <window.UsersTable
+                  data={USERS_FIXTURE}
+                  onDelete={(u) => setDeleteUser(u)}
+                />
+              </main>
+            )}
 
-// Wait for all deferred scripts to load
-function mount() {
-  if (!window.Shell || !window.TargetTile || !window.ToastProvider || !window.QueryModal) {
-    setTimeout(mount, 50); return;
-  }
-  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-}
-mount();
-</script>
-</body>
+            {wakeConfirmTarget && (
+              <window.ConfirmDialog
+                title="Wake service?"
+                message={`Send wake signal to "${wakeConfirmTarget.name}" (currently ${wakeConfirmTarget.state})?\n\nClickHouse Cloud may take a few minutes to bring the service online.`}
+                confirmLabel="Wake"
+                onConfirm={performWake}
+                onCancel={() => setWakeConfirmTarget(null)}
+              />
+            )}
+            {queryModal && (
+              <window.QueryModal
+                queryId={queryModal.id}
+                sql={queryModal.sql}
+                onClose={() => setQueryModal(null)}
+                onKill={onKill}
+              />
+            )}
+            {memPopover && (
+              <window.MemoryPopover
+                proc={memPopover.proc}
+                anchor={memPopover.anchor}
+                onClose={() => setMemPopover(null)}
+              />
+            )}
+            {userPopover && (
+              <window.UserPopover
+                proc={userPopover.proc}
+                anchor={userPopover.anchor}
+                onClose={() => setUserPopover(null)}
+              />
+            )}
+            {deleteUser && (
+              <window.ConfirmDialog
+                title="Delete user?"
+                message={`Delete user "${deleteUser}" on target "${topology.targets[0].name}"?`}
+                confirmLabel="Delete"
+                danger
+                onConfirm={() => {
+                  toastRef.current?.(
+                    "User " + deleteUser + " deleted",
+                    "success",
+                  );
+                  setDeleteUser(null);
+                }}
+                onCancel={() => setDeleteUser(null)}
+              />
+            )}
+          </window.ToastProvider>
+        );
+      }
+
+      // Wait for all deferred scripts to load
+      function mount() {
+        if (
+          !window.Shell ||
+          !window.TargetTile ||
+          !window.ToastProvider ||
+          !window.QueryModal
+        ) {
+          setTimeout(mount, 50);
+          return;
+        }
+        ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+      }
+      mount();
+    </script>
+  </body>
 </html>
