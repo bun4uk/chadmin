@@ -20,7 +20,7 @@
     "symfony/var-dumper": "8.0.8",
     "symfony/yaml": "8.0.8",
     "twig/extra-bundle": "3.24.0",
-    "twig/twig": "3.24.0"
+    "twig/twig": "3.26.0"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",
