@@ -815,6 +815,19 @@ WHERE event_date >= toDate(now() - interval 21600 second)
             ? topology.targets.filter((t) => t.id === selectedTargetId)
             : topology.targets;
 
+        // Stable per-refresh data — without this, App's 1s timeLeft re-render
+        // would create a new `data` object every second, which retriggers
+        // TargetTile's `useEffect(setTick(0), [data])` and freezes elapsed.
+        const targetData = React.useMemo(() => {
+          const out = {};
+          visibleTargets.forEach((t) => {
+            out[t.id] = t.queryable
+              ? buildData(t.id)
+              : { sleeping: true, processes: {} };
+          });
+          return out;
+        }, [topoMode, selectedTargetId, refreshKey]);
+
         const [killingIds, setKillingIds] = React.useState(new Set());
         const [wakingIds, setWakingIds] = React.useState(new Set());
         const [wakeConfirmTarget, setWakeConfirmTarget] = React.useState(null);
@@ -894,11 +907,7 @@ WHERE event_date >= toDate(now() - interval 21600 second)
                   <window.TargetTile
                     key={t.id + refreshKey}
                     target={t}
-                    data={
-                      t.queryable
-                        ? buildData(t.id)
-                        : { sleeping: true, processes: {} }
-                    }
+                    data={targetData[t.id]}
                     killingIds={killingIds}
                     wakingIds={wakingIds}
                     onKill={onKill}
