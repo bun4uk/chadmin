@@ -18,7 +18,7 @@
     "symfony/monolog-bundle": "4.0.2",
     "symfony/twig-bundle": "8.0.8",
     "symfony/var-dumper": "8.0.8",
-    "symfony/yaml": "8.0.8",
+    "symfony/yaml": "8.0.12",
     "twig/extra-bundle": "3.24.0",
     "twig/twig": "3.26.0"
   },
