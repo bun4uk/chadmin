@@ -14,7 +14,7 @@
     "symfony/flex": "2.10.0",
     "symfony/framework-bundle": "8.0.8",
     "symfony/http-client": "8.0.8",
-    "symfony/http-foundation": "8.0.8",
+    "symfony/http-foundation": "8.0.13",
     "symfony/monolog-bundle": "4.0.2",
     "symfony/twig-bundle": "8.0.8",
     "symfony/var-dumper": "8.0.8",
