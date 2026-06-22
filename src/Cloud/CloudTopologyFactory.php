@@ -44,7 +44,7 @@ final class CloudTopologyFactory
         $targets = [];
         $warehouseId = null;
         foreach ($services as $service) {
-            $target = $this->buildTarget($service);
+            $target = $this->buildTarget($service, $orgId);
             if ($target === null) {
                 continue;
             }
@@ -68,7 +68,7 @@ final class CloudTopologyFactory
         );
     }
 
-    private function buildTarget(CloudService $service): ?Target
+    private function buildTarget(CloudService $service, string $orgId): ?Target
     {
         $state = TargetState::fromCloudApi($service->state);
         if ($state === TargetState::Terminated || $state === TargetState::SoftDeleted) {
@@ -77,6 +77,13 @@ final class CloudTopologyFactory
 
         $host = $service->httpsHost() ?? $this->config->host;
         $port = $service->httpsPort();
+
+        // Private endpoint mode: connect through the service's private DNS hostname (resolved from the
+        // control plane) instead of the public endpoint. Falls back to public when it can't be resolved.
+        // The host also feeds the idle-wake /ping in TopologyController, so that stays private too.
+        if ($this->config->cloudUsePrivateDns) {
+            $host = $this->apiClient->privateDnsHostname($service->id, $orgId) ?? $host;
+        }
 
         return new Target(
             id: $service->id,

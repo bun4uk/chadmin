@@ -28,6 +28,8 @@ final class CloudApiClient
     private const BASE_URI = 'https://api.clickhouse.cloud/v1/';
     private const CACHE_TTL_SERVICES = 30;       // seconds — service list + states
     private const CACHE_TTL_ORGANIZATIONS = 300; // seconds — orgs almost never change
+    private const CACHE_TTL_PRIVATE_DNS = 300;   // seconds — private endpoint config is effectively static
+    private const CACHE_TTL_PRIVATE_DNS_MISS = 30; // seconds — re-probe soon after a transient failure
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -134,6 +136,60 @@ final class CloudApiClient
     private function servicesCacheKey(string $orgId): string
     {
         return 'chadmin.cloud.services.' . $orgId;
+    }
+
+    /**
+     * Resolves a service's private endpoint DNS hostname from
+     * GET /v1/organizations/{orgId}/services/{serviceId}/privateEndpointConfig.
+     *
+     * Control-plane only — does NOT wake the service. Used when CLICKHOUSE_CLOUD_USE_PRIVATE_DNS
+     * is on so the data-plane SQL connection (and the idle-wake /ping) goes through the private
+     * endpoint instead of the public one. Returns null when no private endpoint is configured or
+     * the lookup fails, so the caller can fall back to the public endpoint.
+     */
+    public function privateDnsHostname(string $serviceId, ?string $orgId = null): ?string
+    {
+        $orgId = $orgId ?? $this->resolveOrganizationId();
+
+        $compute = function () use ($orgId, $serviceId): ?string {
+            try {
+                $payload = $this->request('GET', sprintf(
+                    'organizations/%s/services/%s/privateEndpointConfig',
+                    urlencode($orgId),
+                    urlencode($serviceId),
+                ));
+            } catch (CloudApiException $e) {
+                $this->logger->warning('Failed to resolve private endpoint config; falling back to public endpoint.', [
+                    'service' => $serviceId,
+                    'error' => $e->getMessage(),
+                ]);
+                return null;
+            }
+
+            $host = is_array($payload) ? trim((string) ($payload['privateDnsHostname'] ?? '')) : '';
+            if ($host === '') {
+                $this->logger->warning('No private DNS hostname configured for service; falling back to public endpoint.', [
+                    'service' => $serviceId,
+                ]);
+                return null;
+            }
+            return $host;
+        };
+
+        if ($this->cache === null) {
+            return $compute();
+        }
+        return $this->cache->get($this->privateDnsCacheKey($orgId, $serviceId), function (ItemInterface $item) use ($compute) {
+            $host = $compute();
+            // Positive config is static → long TTL; a miss is likely transient → re-probe soon.
+            $item->expiresAfter($host !== null ? self::CACHE_TTL_PRIVATE_DNS : self::CACHE_TTL_PRIVATE_DNS_MISS);
+            return $host;
+        });
+    }
+
+    private function privateDnsCacheKey(string $orgId, string $serviceId): string
+    {
+        return 'chadmin.cloud.private_dns.' . $orgId . '.' . $serviceId;
     }
 
     /**

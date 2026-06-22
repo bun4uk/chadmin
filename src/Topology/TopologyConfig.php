@@ -23,6 +23,7 @@ final readonly class TopologyConfig
         public string $cloudKeySecret,      // CLICKHOUSE_CLOUD_KEY_SECRET
         public string $cloudOrgId,          // CLICKHOUSE_CLOUD_ORG_ID
         public string $cloudServiceAllowlist,   // CLICKHOUSE_CLOUD_SERVICE_ALLOWLIST (csv)
+        public bool $cloudUsePrivateDns = false, // CLICKHOUSE_CLOUD_USE_PRIVATE_DNS: connect via private endpoint hostname
     ) {}
 
     /** @return list<string> Trimmed non-empty host list. */

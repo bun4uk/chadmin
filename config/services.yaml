@@ -10,6 +10,7 @@ parameters:
     env(CLICKHOUSE_CLOUD_KEY_SECRET): ''
     env(CLICKHOUSE_CLOUD_ORG_ID): ''
     env(CLICKHOUSE_CLOUD_SERVICE_ALLOWLIST): ''
+    env(CLICKHOUSE_CLOUD_USE_PRIVATE_DNS): 'false'
 
 services:
     _defaults:
@@ -62,6 +63,7 @@ services:
             $cloudKeySecret:          '%env(CLICKHOUSE_CLOUD_KEY_SECRET)%'
             $cloudOrgId:              '%env(CLICKHOUSE_CLOUD_ORG_ID)%'
             $cloudServiceAllowlist:   '%env(CLICKHOUSE_CLOUD_SERVICE_ALLOWLIST)%'
+            $cloudUsePrivateDns:      '%env(bool:CLICKHOUSE_CLOUD_USE_PRIVATE_DNS)%'
 
     App\Topology\TopologyProvider:
         public: true
