@@ -36,7 +36,7 @@
     "@types/react-transition-group": "4.4.12",
     "@vitejs/plugin-react": "6.0.1",
     "autoprefixer": "10.5.0",
-    "postcss": "8.5.10",
+    "postcss": "8.5.25",
     "tailwindcss": "4.2.4",
     "typescript": "6.0.3",
     "vite": "8.0.16",
