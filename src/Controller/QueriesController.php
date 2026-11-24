@@ -47,8 +47,14 @@ final class QueriesController extends AbstractController
             ]);
         }
 
-        $processesRows = $client->select($this->queryBuilder->processesSql($target))->rows();
-        $memoryRows = $client->select($this->queryBuilder->memoryMetricsSql($target))->rows();
+        // Обидва запити йдуть паралельно (curl_multi): клієнт не перевикористовує з'єднання, тож послідовно
+        // це два окремі round-trip'и — а в Cloud ще й два TLS handshake — на кожен poll.
+        $processesStmt = $client->selectAsync($this->queryBuilder->processesSql($target));
+        $memoryStmt = $client->selectAsync($this->queryBuilder->memoryMetricsSql($target));
+        $client->executeAsync();
+
+        $processesRows = $processesStmt->rows();
+        $memoryRows = $memoryStmt->rows();
 
         $processes = [];
         foreach ($processesRows as $row) {

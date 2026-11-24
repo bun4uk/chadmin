@@ -14,8 +14,17 @@ use App\Topology\TopologyMode;
  */
 final class QueryBuilder
 {
+    /**
+     * Колонки system.processes, які UI не показує, але які роздувають відповідь (ProfileEvents — Map
+     * лічильників на кожен запит). EXCEPT без STRICT мовчки ігнорує колонки, яких немає у старіших
+     * версіях ClickHouse, тому це безпечніше за явний перелік потрібних колонок.
+     */
+    private const PROCESSES_HEAVY_COLUMNS = 'ProfileEvents, Settings, thread_ids';
+
     public function processesSql(Target $target): string
     {
+        $heavy = self::PROCESSES_HEAVY_COLUMNS;
+
         if ($this->isSingleNode($target)) {
             return <<<SQL
             SELECT
@@ -25,7 +34,7 @@ final class QueryBuilder
             (
                 SELECT
                     FQDN() AS fqdn,
-                    *,
+                    * EXCEPT ($heavy),
                     formatReadableSize(memory_usage) AS formatted_memory_usage,
                     formatReadableSize(peak_memory_usage) AS formatted_peak_memory_usage,
                     formatReadableSize(read_bytes) AS formatted_read_bytes,
@@ -51,7 +60,7 @@ final class QueryBuilder
         (
             SELECT
                 FQDN() AS fqdn,
-                *,
+                * EXCEPT ($heavy),
                 formatReadableSize(memory_usage) AS formatted_memory_usage,
                 formatReadableSize(peak_memory_usage) AS formatted_peak_memory_usage,
                 formatReadableSize(read_bytes) AS formatted_read_bytes,
